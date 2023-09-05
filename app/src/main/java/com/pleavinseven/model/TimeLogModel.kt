@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@Entity(tableName = "alarm_table")
+@Entity(tableName = "time_log")
 data class TimeLogModel(
     @PrimaryKey(autoGenerate = true)
     val logId: Int,

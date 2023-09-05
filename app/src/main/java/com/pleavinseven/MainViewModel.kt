@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.pleavinseven.model.Repository
+import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.TimeLogModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

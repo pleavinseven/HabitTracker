@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.pleavinseven.model.HabitDatabase
-import com.pleavinseven.model.Repository
+import com.pleavinseven.model.database.HabitDatabase
+import com.pleavinseven.model.database.Repository
 import com.pleavinseven.ui.HabitTrackerApp
 import com.pleavinseven.ui.theme.HabitTrackerTheme
 

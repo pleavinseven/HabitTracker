@@ -3,7 +3,7 @@ package com.pleavinseven
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.pleavinseven.model.Repository
+import com.pleavinseven.model.database.Repository
 
 class MainViewModelFactory(
 

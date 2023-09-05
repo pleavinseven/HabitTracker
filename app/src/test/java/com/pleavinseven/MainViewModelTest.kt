@@ -3,8 +3,8 @@ package com.pleavinseven
 import android.app.Application
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.pleavinseven.model.Repository
-import com.pleavinseven.model.TestDatabase
+import com.pleavinseven.model.database.Repository
+import com.pleavinseven.model.database.TestDatabase
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
