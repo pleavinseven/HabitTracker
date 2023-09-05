@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.pleavinseven.model.HabitDatabase
 import com.pleavinseven.model.Repository
 import com.pleavinseven.model.TimeLogModel
 import kotlinx.coroutines.Dispatchers
@@ -14,23 +13,23 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(
+    private val repository: Repository, application: Application
+) : AndroidViewModel(application) {
 
-    private var repository: Repository
     var count by mutableStateOf(0)
 
-    init {
-        val db = HabitDatabase.getDatabase(application)
-        val timeLogDao = db.timeLogDao()
-        repository = Repository(timeLogDao)
-    }
 
     fun onCountButtonClicked() {
-        count += 1
-        logTimeStamp()
+        addCount()
+        logTimeStampInDatabase()
     }
 
-    private fun logTimeStamp() {
+    private fun addCount() {
+        count++
+    }
+
+    private fun logTimeStampInDatabase() {
         val currentTime = LocalDateTime.now()
         val timeLogModel = TimeLogModel(
             logId = 0,
