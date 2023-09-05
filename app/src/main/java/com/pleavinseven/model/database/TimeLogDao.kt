@@ -1,8 +1,9 @@
-package com.pleavinseven.model
+package com.pleavinseven.model.database
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import com.pleavinseven.model.TimeLogModel
 
 @Dao
 interface TimeLogDao {

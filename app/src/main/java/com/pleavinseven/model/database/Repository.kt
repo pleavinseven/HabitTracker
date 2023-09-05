@@ -1,4 +1,6 @@
-package com.pleavinseven.model
+package com.pleavinseven.model.database
+
+import com.pleavinseven.model.TimeLogModel
 
 
 class Repository(private val timeLogDao: TimeLogDao) {
