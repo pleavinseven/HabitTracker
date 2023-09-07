@@ -1,4 +1,4 @@
-package com.pleavinseven.model
+package com.pleavinseven.model.entities
 
 import android.os.Parcelable
 import androidx.room.Entity
@@ -8,12 +8,12 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "time_log")
 data class TimeLogModel(
-    @PrimaryKey(autoGenerate = true)
-    val logId: Int,
+    @PrimaryKey(autoGenerate = true) val logId: Int,
     val year: Int,
     val month: Int,
     val day: Int,
     val hour: Int,
     val min: Int,
     val seconds: Int?,
-    ): Parcelable
+    val habitName: String
+) : Parcelable

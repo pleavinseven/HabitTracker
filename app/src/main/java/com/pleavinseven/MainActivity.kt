@@ -15,7 +15,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val db = HabitDatabase.getDatabase(application)
         val timeLogDao = db.timeLogDao()
-        val repository = Repository(timeLogDao)
+        val habitDao = db.habitDao()
+        val repository = Repository(timeLogDao, habitDao)
 
         val viewModel: MainViewModel by viewModels {
 

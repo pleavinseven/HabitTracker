@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.pleavinseven.model.TimeLogModel
+import com.pleavinseven.model.entities.TimeLogModel
+import com.pleavinseven.model.entities.Habit
 
 
-@Database(entities = [TimeLogModel::class], version = 1)
+@Database(entities = [TimeLogModel::class, Habit::class], version = 2)
 abstract class HabitDatabase : RoomDatabase() {
 
 
     abstract fun timeLogDao(): TimeLogDao
+    abstract fun habitDao(): HabitDao
 
     companion object {
         @Volatile
