@@ -2,6 +2,7 @@ package com.pleavinseven
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -9,10 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
-import com.pleavinseven.model.entities.relations.HabitWithTimeLogs
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -22,7 +20,7 @@ class MainViewModel(
 
     var count by mutableStateOf(0)
     private var testHabitName = "testHabit"
-    var habitWithTimeLogsFlow: Flow<List<HabitWithTimeLogs>> = flowOf()
+    var habitWithTimeLogsFlow = mutableStateListOf<String>()
 
 
     fun onCountButtonClicked() {
@@ -45,7 +43,7 @@ class MainViewModel(
     }
 
     private fun logTimeStampInDatabase() {
-        val habitName = "habit two"
+        val habitName = testHabitName
         val currentTime = LocalDateTime.now()
         val timeLogModel = TimeLogModel(
             logId = 0,
@@ -62,11 +60,16 @@ class MainViewModel(
         }
     }
 
-    fun getTimeLogs(habitName: String) {
+    private fun getTimeLogs(habitName: String) {
         viewModelScope.launch {
             repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
-                for (timeLog in habitWithTimeLogsList[0].timeLogs) {
-                    val formattedTime = formatReadableTime(timeLog)
+                for (habitWithTimeLog in habitWithTimeLogsList) {
+                    val timeLogs = habitWithTimeLog.timeLogs
+
+                    for (item in timeLogs) {
+                        val formatted = formatReadableTime(item)
+                        habitWithTimeLogsFlow += formatted
+                    }
                 }
             }
         }
