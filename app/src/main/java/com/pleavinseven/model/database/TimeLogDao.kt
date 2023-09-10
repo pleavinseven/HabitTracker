@@ -3,7 +3,11 @@ package com.pleavinseven.model.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import com.pleavinseven.model.TimeLogModel
+import androidx.room.Query
+import androidx.room.Transaction
+import com.pleavinseven.model.entities.TimeLogModel
+import com.pleavinseven.model.entities.relations.HabitWithTimeLogs
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TimeLogDao {
@@ -13,5 +17,9 @@ interface TimeLogDao {
 
     @Delete
     suspend fun deleteTimeLog(timeLogModel: TimeLogModel)
+
+    @Transaction
+    @Query("SELECT * FROM habit where habitName = :habitName")
+    fun getHabitWithTimeLogs(habitName: String): Flow<List<HabitWithTimeLogs>>
 
 }
