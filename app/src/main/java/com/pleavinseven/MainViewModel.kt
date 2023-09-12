@@ -20,7 +20,8 @@ class MainViewModel(
 
     var count by mutableStateOf(0)
     private var testHabitName = "testHabit"
-    var habitWithTimeLogsFlow = mutableStateListOf<String>()
+    var timeLogsList = mutableStateListOf<String>()
+    var habitList = mutableStateListOf<Habit>()
 
 
     fun onCountButtonClicked() {
@@ -64,11 +65,11 @@ class MainViewModel(
         viewModelScope.launch {
             repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
                 for (habitWithTimeLog in habitWithTimeLogsList) {
-                    val timeLogs = habitWithTimeLog.timeLogs
+                    val _timeLogsList = habitWithTimeLog.timeLogs
 
-                    for (item in timeLogs) {
+                    for (item in _timeLogsList) {
                         val formatted = formatReadableTime(item)
-                        habitWithTimeLogsFlow += formatted
+                        timeLogsList += formatted
                     }
                 }
             }
