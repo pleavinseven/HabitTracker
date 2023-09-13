@@ -10,12 +10,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
 import androidx.compose.ui.unit.dp
 import com.pleavinseven.MainViewModel
 
 
 @Composable
 fun HabitTrackerApp(viewModel: MainViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "HabitsPage") {
+        composable("HabitsPage") {
+            HabitsPage(viewModel = viewModel, navController)
+        }
+        composable("CounterPage") {
+            CounterPage(viewModel = viewModel)
+        }
+    }
+}
+
+@Composable
+fun CounterPage(viewModel: MainViewModel) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
