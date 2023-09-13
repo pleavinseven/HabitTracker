@@ -11,16 +11,16 @@ class Repository(private val timeLogDao: TimeLogDao, private val habitDao: Habit
         return timeLogDao.getHabitWithTimeLogs(habitName)
     }
 
+    fun getHabits(): Flow<List<Habit>> {
+        return habitDao.getHabits()
+    }
+
     suspend fun addTimeLog(timeLogModel: TimeLogModel) {
         timeLogDao.addTimeLog(timeLogModel)
     }
 
     suspend fun addHabit(habit: Habit) {
         habitDao.addHabit(habit)
-    }
-
-    suspend fun deleteTimeLog(timeLogModel: TimeLogModel) {
-        timeLogDao.deleteTimeLog(timeLogModel)
     }
 
 }
