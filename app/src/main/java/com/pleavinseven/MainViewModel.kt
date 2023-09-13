@@ -2,7 +2,7 @@ package com.pleavinseven
 
 import android.app.Application
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -18,16 +18,27 @@ class MainViewModel(
     private val repository: Repository, application: Application
 ) : AndroidViewModel(application) {
 
-    var count by mutableStateOf(0)
+    var count by mutableIntStateOf(0)
     private var testHabitName = "testHabit"
-    var timeLogsList = mutableStateListOf<String>()
-    var habitList = mutableStateListOf<Habit>()
+    var timeLogsList by mutableStateOf(emptyList<String>())
+    var habitList by mutableStateOf(emptyList<Habit>())
 
+    init {
+        getHabits()
+    }
 
     fun onCountButtonClicked() {
         addCount()
         logTimeStampInDatabase()
         getTimeLogs(testHabitName)
+        println(timeLogsList.size)
+        for (timeLog in timeLogsList) {
+            println(timeLog)
+        }
+    }
+
+    fun createHabitClicked(habitName: String) {
+        addHabitToDB(habitName)
     }
 
     private fun addHabitToDB(habitName: String) {
@@ -61,15 +72,20 @@ class MainViewModel(
         }
     }
 
+    private fun getHabits() {
+        viewModelScope.launch {
+            repository.getHabits().collect { habitListFlow ->
+                habitList = habitListFlow
+            }
+        }
+    }
+
     private fun getTimeLogs(habitName: String) {
         viewModelScope.launch {
             repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
                 for (habitWithTimeLog in habitWithTimeLogsList) {
-                    val _timeLogsList = habitWithTimeLog.timeLogs
-
-                    for (item in _timeLogsList) {
-                        val formatted = formatReadableTime(item)
-                        timeLogsList += formatted
+                    timeLogsList = habitWithTimeLog.timeLogs.map { item ->
+                        formatReadableTime(item)
                     }
                 }
             }
