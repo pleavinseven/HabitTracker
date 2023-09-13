@@ -2,7 +2,6 @@ package com.pleavinseven
 
 import android.app.Application
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -18,8 +17,6 @@ class MainViewModel(
     private val repository: Repository, application: Application
 ) : AndroidViewModel(application) {
 
-    var count by mutableIntStateOf(0)
-    private var testHabitName = "testHabit"
     var timeLogsList by mutableStateOf(emptyList<String>())
     var habitList by mutableStateOf(emptyList<Habit>())
 
@@ -27,14 +24,10 @@ class MainViewModel(
         getHabits()
     }
 
-    fun onCountButtonClicked() {
-        addCount()
-        logTimeStampInDatabase()
-        getTimeLogs(testHabitName)
-        println(timeLogsList.size)
-        for (timeLog in timeLogsList) {
-            println(timeLog)
-        }
+    fun onCountButtonClicked(habit: Habit) {
+        addCount(habit)
+        logTimeStampInDatabase(habit.habitName)
+        getTimeLogs(habit.habitName)
     }
 
     fun createHabitClicked(habitName: String) {
@@ -43,19 +36,21 @@ class MainViewModel(
 
     private fun addHabitToDB(habitName: String) {
         val habit = Habit(
-            habitName, count
+            habitName, 0
         )
         viewModelScope.launch(Dispatchers.IO) {
             repository.addHabit(habit)
         }
     }
 
-    private fun addCount() {
-        count++
+    private fun addCount(habit: Habit) {
+        habit.count++
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addCount(habit)
+        }
     }
 
-    private fun logTimeStampInDatabase() {
-        val habitName = testHabitName
+    private fun logTimeStampInDatabase(habitName: String) {
         val currentTime = LocalDateTime.now()
         val timeLogModel = TimeLogModel(
             logId = 0,
@@ -94,5 +89,12 @@ class MainViewModel(
 
     private fun formatReadableTime(currentTime: TimeLogModel): String {
         return "${currentTime.day}-${currentTime.month}-${currentTime.year} ${currentTime.hour}:${currentTime.min}"
+    }
+
+    fun getHabitFromId(habitName: String): Habit {
+        val habitFromId = habitList.find { habit ->
+            habitName == habit.habitName
+        }
+        return habitFromId!!
     }
 }

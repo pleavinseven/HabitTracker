@@ -10,5 +10,5 @@ import kotlinx.parcelize.Parcelize
 data class Habit (
     @PrimaryKey(autoGenerate = false)
     val habitName: String,
-    val count: Int,
+    var count: Int,
 ) : Parcelable

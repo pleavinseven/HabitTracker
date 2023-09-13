@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.pleavinseven.model.entities.Habit
 import kotlinx.coroutines.flow.Flow
 
@@ -16,5 +17,8 @@ interface HabitDao {
     @Transaction
     @Query("SELECT * FROM habit")
     fun getHabits(): Flow<List<Habit>>
+
+    @Update
+    suspend fun addCount(habit: Habit)
 
 }

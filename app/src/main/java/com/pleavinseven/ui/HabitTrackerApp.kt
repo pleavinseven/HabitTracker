@@ -37,13 +37,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pleavinseven.MainViewModel
@@ -56,28 +55,34 @@ fun HabitTrackerApp(viewModel: MainViewModel) {
         composable("HabitsPage") {
             HabitsPage(viewModel = viewModel, navController)
         }
-        composable("CounterPage") {
-            CounterPage(viewModel = viewModel)
+        composable("CounterPage/{habitName}") { backStackEntry ->
+            backStackEntry.arguments?.getString("habitName")
+                ?.let { CounterPage(viewModel = viewModel, it) }
         }
     }
 }
 
 @Composable
-fun CounterPage(viewModel: MainViewModel) {
+fun CounterPage(viewModel: MainViewModel, habitName: String) {
+    val habit = viewModel.getHabitFromId(habitName)
+    val startCount = habit.count.toString()
+    var count by remember {
+        mutableStateOf(startCount)
+    }
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         TextButton(
             modifier = Modifier.size(500.dp),
             onClick = {
-                viewModel.onCountButtonClicked()
+                viewModel.onCountButtonClicked(habit)
+                count = habit.count.toString()
             },
         ) {
             Text(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.displayLarge,
-                text = viewModel.count.toString()
+                text = count
             )
         }
     }
@@ -109,7 +114,11 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Transparent)
-                            .clickable { navController.navigate("CounterPage") },
+                            .clickable {
+                                navController.navigate(
+                                    "CounterPage/${viewModel.habitList[item].habitName}"
+                                )
+                            },
                         shape = RoundedCornerShape(35.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.Transparent
