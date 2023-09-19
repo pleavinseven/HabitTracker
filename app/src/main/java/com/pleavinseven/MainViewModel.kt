@@ -27,11 +27,14 @@ class MainViewModel(
     fun onCountButtonClicked(habit: Habit) {
         addCount(habit)
         logTimeStampInDatabase(habit.habitName)
-        getTimeLogs(habit.habitName)
     }
 
-    fun createHabitClicked(habitName: String) {
-        addHabitToDB(habitName)
+    fun createHabitClicked(habitName: String): Boolean {
+        if (!checkHabitDuplicateOrEmpty(habitName)) {
+            addHabitToDB(habitName)
+            return true
+        }
+        return false
     }
 
     private fun addHabitToDB(habitName: String) {
@@ -42,6 +45,14 @@ class MainViewModel(
             repository.addHabit(habit)
         }
     }
+
+    private fun checkHabitDuplicateOrEmpty(habitName: String): Boolean {
+        if (habitName.isNotBlank()) {
+            return habitList.any { habit -> habit.habitName == habitName }
+        }
+        return true
+    }
+
 
     private fun addCount(habit: Habit) {
         habit.count++
