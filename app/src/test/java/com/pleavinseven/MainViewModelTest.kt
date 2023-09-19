@@ -41,6 +41,7 @@ class MainViewModelTest {
         coEvery { mockRepository.addCount(any()) } returns Unit
         coEvery { mockRepository.addTimeLog(any()) } returns Unit
         coEvery { mockRepository.getHabitWithTimeLogs(any()) } returns flowOf()
+        coEvery { mockRepository.addHabit(any()) } returns Unit
         launch { viewModel = MainViewModel(mockRepository, applicationMock) }
     }
 
@@ -52,7 +53,6 @@ class MainViewModelTest {
 
     @Test
     fun testAddHabitToDB() {
-        coEvery { mockRepository.addHabit(any()) } returns Unit
         viewModel.createHabitClicked(testHabit.habitName)
         coVerify {
             mockRepository.addHabit(match {
