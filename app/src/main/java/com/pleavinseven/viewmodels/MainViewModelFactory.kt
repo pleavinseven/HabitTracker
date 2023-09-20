@@ -1,4 +1,4 @@
-package com.pleavinseven
+package com.pleavinseven.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

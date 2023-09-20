@@ -4,6 +4,7 @@ import android.app.Application
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
+import com.pleavinseven.viewmodels.MainViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
