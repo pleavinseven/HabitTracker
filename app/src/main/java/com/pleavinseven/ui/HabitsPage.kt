@@ -3,6 +3,7 @@ package com.pleavinseven.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -63,32 +64,37 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         }
         LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
             items(viewModel.habitList.size) { item ->
-                Box(
+                OutlinedCard(
+                    elevation = CardDefaults.cardElevation(4.dp),
                     modifier = Modifier
+                        .fillMaxSize()
                         .padding(8.dp)
                         .aspectRatio(1f)
-                        .fillMaxSize()
-                        .background(Color.Transparent),
-                    contentAlignment = Alignment.Center,
+                        .clickable {
+                            navController.navigate(
+                                "CounterPage/${viewModel.habitList[item].habitName}"
+                            )
+                        },
+                    shape = RoundedCornerShape(35.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    border = BorderStroke(4.dp, Color.Black),
                 ) {
-                    OutlinedCard(
-                        elevation = CardDefaults.cardElevation(6.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Transparent)
-                            .clickable {
-                                navController.navigate(
-                                    "CounterPage/${viewModel.habitList[item].habitName}"
-                                )
-                            },
-                        shape = RoundedCornerShape(35.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Transparent
-                        ),
-                        border = BorderStroke(4.dp, Color.Black),
+                    Column(
+                        Modifier
+                            .padding(6.dp)
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = viewModel.habitList[item].habitName,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.displayLarge,
+                        )
+                        Text(
+                            text = viewModel.habitList[item].count.toString(),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.displayLarge,
                         )
