@@ -29,6 +29,10 @@ class MainViewModel(
         logTimeStampInDatabase(habit.habitName)
     }
 
+    fun onDecreaseButtonClicked(habit: Habit) {
+        decreaseCount(habit)
+    }
+
     fun createHabitClicked(habitName: String): Boolean {
         if (!checkHabitDuplicateOrEmpty(habitName)) {
             addHabitToDB(habitName)
@@ -53,11 +57,19 @@ class MainViewModel(
         return true
     }
 
-
     private fun addCount(habit: Habit) {
         habit.count++
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addCount(habit)
+            repository.updateCount(habit)
+        }
+    }
+
+    private fun decreaseCount(habit: Habit) {
+        if (habit.count >= 1) {
+            habit.count--
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.updateCount(habit)
+            }
         }
     }
 
@@ -86,7 +98,7 @@ class MainViewModel(
         }
     }
 
-    private fun getTimeLogs(habitName: String) {
+    fun getTimeLogs(habitName: String) {
         viewModelScope.launch {
             repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
                 for (habitWithTimeLog in habitWithTimeLogsList) {

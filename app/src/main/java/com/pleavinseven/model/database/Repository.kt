@@ -24,8 +24,8 @@ class Repository(private val timeLogDao: TimeLogDao, private val habitDao: Habit
     }
 
 
-    suspend fun addCount(habit: Habit) {
-        habitDao.addCount(habit)
+    suspend fun updateCount(habit: Habit) {
+        habitDao.updateCount(habit)
     }
 
 }
