@@ -62,46 +62,7 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         if (showPopupWindow) {
             AddHabitPopUp(viewModel) { showPopupWindow = false }
         }
-        LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
-            items(viewModel.habitList.size) { item ->
-                OutlinedCard(
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                        .aspectRatio(1f)
-                        .clickable {
-                            navController.navigate(
-                                "CounterPage/${viewModel.habitList[item].habitName}"
-                            )
-                        },
-                    shape = RoundedCornerShape(35.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    border = BorderStroke(4.dp, Color.Black),
-                ) {
-                    Column(
-                        Modifier
-                            .padding(6.dp)
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = viewModel.habitList[item].habitName,
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.displayLarge,
-                        )
-                        Text(
-                            text = viewModel.habitList[item].count.toString(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.displayLarge,
-                        )
-                    }
-                }
-            }
-        })
+        HabitLazyGrid(viewModel = viewModel, navController = navController)
         FloatingActionButton(
             onClick = {
                 showPopupWindow = !showPopupWindow
@@ -117,6 +78,52 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
             )
         }
     }
+}
+
+@Composable
+fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
+    LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
+        items(viewModel.habitList.size) { item ->
+            val habitName = viewModel.habitList[item].habitName
+            OutlinedCard(
+                elevation = CardDefaults.cardElevation(4.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .aspectRatio(1f)
+                    .clickable {
+                        navController.navigate(
+                            "CounterPage/${habitName}"
+                        )
+                        viewModel.getTimeLogs(habitName)
+                    },
+                shape = RoundedCornerShape(35.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.onSurface
+                ),
+                border = BorderStroke(4.dp, Color.Black),
+            ) {
+                Column(
+                    Modifier
+                        .padding(6.dp)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = viewModel.habitList[item].habitName,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.displayLarge,
+                    )
+                    Text(
+                        text = viewModel.habitList[item].count.toString(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.displayLarge,
+                    )
+                }
+            }
+        }
+    })
 }
 
 @Composable
