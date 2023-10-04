@@ -23,9 +23,11 @@ class Repository(private val timeLogDao: TimeLogDao, private val habitDao: Habit
         habitDao.addHabit(habit)
     }
 
-
     suspend fun updateCount(habit: Habit) {
         habitDao.updateCount(habit)
     }
 
+    suspend fun removeLastTimeLog(timeLogModel: TimeLogModel) {
+        timeLogDao.deleteTimeLog(timeLogModel)
+    }
 }

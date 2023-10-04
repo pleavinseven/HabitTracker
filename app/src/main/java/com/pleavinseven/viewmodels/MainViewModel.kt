@@ -17,7 +17,8 @@ class MainViewModel(
     private val repository: Repository, application: Application
 ) : AndroidViewModel(application) {
 
-    var timeLogsList by mutableStateOf(emptyList<String>())
+    var formattedTimeLogList by mutableStateOf(emptyList<String>())
+    var timeLogList by mutableStateOf(emptyList<TimeLogModel>())
     var habitList by mutableStateOf(emptyList<Habit>())
 
     init {
@@ -30,7 +31,12 @@ class MainViewModel(
     }
 
     fun onDecreaseButtonClicked(habit: Habit) {
-        decreaseCount(habit)
+        if (habit.count >= 1) {
+            decreaseCount(habit)
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.removeLastTimeLog(timeLogList.last())
+            }
+        }
     }
 
     fun createHabitClicked(habitName: String): Boolean {
@@ -65,11 +71,9 @@ class MainViewModel(
     }
 
     private fun decreaseCount(habit: Habit) {
-        if (habit.count >= 1) {
-            habit.count--
-            viewModelScope.launch(Dispatchers.IO) {
-                repository.updateCount(habit)
-            }
+        habit.count--
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateCount(habit)
         }
     }
 
@@ -102,7 +106,8 @@ class MainViewModel(
         viewModelScope.launch {
             repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
                 for (habitWithTimeLog in habitWithTimeLogsList) {
-                    timeLogsList = habitWithTimeLog.timeLogs.map { item ->
+                    timeLogList = habitWithTimeLog.timeLogs
+                    formattedTimeLogList = habitWithTimeLog.timeLogs.map { item ->
                         formatReadableTime(item)
                     }
                 }
