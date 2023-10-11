@@ -3,8 +3,8 @@ package com.pleavinseven.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,9 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +47,6 @@ fun CounterPage(viewModel: MainViewModel, habitName: String) {
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = habitName.uppercase(),
@@ -54,44 +54,55 @@ fun CounterPage(viewModel: MainViewModel, habitName: String) {
                 style = MaterialTheme.typography.displayLarge,
             )
             Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp, 30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                FilledTonalButton(
+                IconButton(
                     onClick = {
                         viewModel.onDecreaseButtonClicked(habit)
                         count = habit.count.toString()
                     },
                     modifier = Modifier
-                        .size(40.dp)
-                        .weight(0.3f),
-                    contentPadding = PaddingValues(0.dp),
-                    shape = CircleShape
+                        .size(60.dp)
+                        .weight(0.5f),
                 ) {
                     Icon(
+                        modifier = Modifier.size(160.dp),
                         imageVector = Icons.Filled.Remove,
                         contentDescription = stringResource(id = R.string.add_habit_description)
                     )
                 }
-                Text(
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    fontSize = 150.sp,
-                    text = count
-                )
-                FilledTonalButton(
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f),
+                    shape = CircleShape,
+                ) {
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            fontSize = 130.sp,
+                            text = count
+                        )
+                    }
+                }
+                IconButton(
                     onClick = {
                         viewModel.onCountButtonClicked(habit)
                         count = habit.count.toString()
                     },
                     modifier = Modifier
-                        .size(40.dp)
-                        .weight(0.3f),
-                    contentPadding = PaddingValues(0.dp),
-                    shape = CircleShape,
+                        .weight(0.5f)
+                        .size(60.dp)
                 ) {
                     Icon(
+                        modifier = Modifier.size(160.dp),
                         imageVector = Icons.Filled.Add,
                         contentDescription = stringResource(id = R.string.add_habit_description)
                     )
