@@ -5,6 +5,7 @@ import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.viewmodels.MainViewModel
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -25,24 +27,41 @@ import java.time.LocalDateTime
 
 class MainViewModelTest {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
     private val applicationMock = mockk<Application> {
         every { applicationContext } returns mockk()
     }
     private lateinit var mockRepository: Repository
     private lateinit var viewModel: MainViewModel
-    private val testHabitList = mutableListOf(Habit("Habit 1", 0), Habit("Habit 2", 1))
+    private val testHabitList = mutableListOf(
+        Habit("Habit 1", 0), Habit("Habit 2", 1)
+    )
     private val testHabit = Habit("testHabit", 0)
+    private val mockTimeLogList = listOf(mockk<TimeLogModel>())
+    private val currentTime: LocalDateTime = LocalDateTime.now()
+    private val timeLogModel = TimeLogModel(
+        logId = 0,
+        year = currentTime.year,
+        month = currentTime.monthValue,
+        day = currentTime.dayOfMonth,
+        hour = currentTime.hour,
+        min = currentTime.minute,
+        seconds = currentTime.second,
+        habitName = testHabit.habitName
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() = runTest {
-        Dispatchers.setMain(Dispatchers.Unconfined)
+        Dispatchers.setMain(testDispatcher)
         mockRepository = mockk()
         coEvery { mockRepository.getHabits() } returns flowOf(testHabitList)
-        coEvery { mockRepository.addCount(any()) } returns Unit
+        coEvery { mockRepository.updateCount(any()) } returns Unit
         coEvery { mockRepository.addTimeLog(any()) } returns Unit
         coEvery { mockRepository.getHabitWithTimeLogs(any()) } returns flowOf()
         coEvery { mockRepository.addHabit(any()) } returns Unit
+        coEvery { mockRepository.removeLastTimeLog(any()) } returns Unit
         launch { viewModel = MainViewModel(mockRepository, applicationMock) }
     }
 
@@ -50,6 +69,7 @@ class MainViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        clearAllMocks()
     }
 
     @Test
@@ -57,8 +77,7 @@ class MainViewModelTest {
         viewModel.createHabitClicked(testHabit.habitName)
         coVerify {
             mockRepository.addHabit(match {
-                it.habitName == testHabit.habitName
-                        && it.count == 0
+                it.habitName == testHabit.habitName && it.count == 0
             })
         }
     }
@@ -73,28 +92,45 @@ class MainViewModelTest {
         viewModel.onCountButtonClicked(testHabit)
         assertEquals(1, testHabit.count)
         coVerify {
-            mockRepository.addCount(match
-            {
-                it.habitName == testHabit.habitName &&
-                        it.count == 1
-            }
-            )
+            mockRepository.updateCount(match {
+                it.habitName == testHabit.habitName && it.count == 1
+            })
         }
     }
 
     @Test
+    fun testDecreaseCount_WhenCountIsZero() {
+        viewModel.timeLogList = emptyList()
+        viewModel.onDecreaseButtonClicked(testHabit)
+        assertEquals(0, testHabit.count)
+        coVerify(exactly = 0) {
+            mockRepository.updateCount(any())
+        }
+    }
+
+    @Test
+    fun testDecreaseCount_WhenCountIsGreaterThanZero() {
+        testHabit.count = 1
+        viewModel.timeLogList = mockTimeLogList
+        viewModel.onDecreaseButtonClicked(testHabit)
+        assertEquals(0, testHabit.count)
+        coVerify {
+            mockRepository.updateCount(match {
+                it.habitName == testHabit.habitName && it.count == 0
+            })
+        }
+    }
+
+    @Test
+    fun testRemoveLastTimeLog_WhenCountIsGreaterThanZero() = runTest(testDispatcher) {
+        testHabit.count = 1
+        viewModel.timeLogList = mockTimeLogList.toMutableList()
+        viewModel.onDecreaseButtonClicked(testHabit)
+        coVerify { mockRepository.removeLastTimeLog(mockTimeLogList.last()) }
+    }
+
+    @Test
     fun testLogTimeStampInDatabase() {
-        val currentTime = LocalDateTime.now()
-        val timeLogModel = TimeLogModel(
-            logId = 0,
-            year = currentTime.year,
-            month = currentTime.monthValue,
-            day = currentTime.dayOfMonth,
-            hour = currentTime.hour,
-            min = currentTime.minute,
-            seconds = currentTime.second,
-            habitName = testHabit.habitName
-        )
         viewModel.onCountButtonClicked(testHabit)
         coVerify {
             mockRepository.addTimeLog(match {
