@@ -3,9 +3,16 @@ package com.pleavinseven.model.database
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.model.entities.relations.HabitWithTimeLogs
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-class Repository(private val timeLogDao: TimeLogDao, private val habitDao: HabitDao) {
+class Repository(
+    private val timeLogDao: TimeLogDao,
+    private val habitDao: HabitDao,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
 
     fun getHabitWithTimeLogs(habitName: String): Flow<List<HabitWithTimeLogs>> {
         return timeLogDao.getHabitWithTimeLogs(habitName)
@@ -15,19 +22,23 @@ class Repository(private val timeLogDao: TimeLogDao, private val habitDao: Habit
         return habitDao.getHabits()
     }
 
-    suspend fun addTimeLog(timeLogModel: TimeLogModel) {
+    suspend fun addTimeLog(timeLogModel: TimeLogModel) = withContext(dispatcher) {
         timeLogDao.addTimeLog(timeLogModel)
     }
 
-    suspend fun addHabit(habit: Habit) {
+    suspend fun addHabit(habit: Habit) = withContext(dispatcher) {
         habitDao.addHabit(habit)
     }
 
-    suspend fun updateCount(habit: Habit) {
+    suspend fun deleteHabit(habit: Habit) = withContext(dispatcher) {
+        habitDao.deleteHabit(habit)
+    }
+
+    suspend fun updateCount(habit: Habit) = withContext(dispatcher) {
         habitDao.updateCount(habit)
     }
 
-    suspend fun removeLastTimeLog(timeLogModel: TimeLogModel) {
+    suspend fun removeLastTimeLog(timeLogModel: TimeLogModel) = withContext(dispatcher) {
         timeLogDao.deleteTimeLog(timeLogModel)
     }
 }
