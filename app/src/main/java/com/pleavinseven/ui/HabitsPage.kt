@@ -1,8 +1,8 @@
 package com.pleavinseven.ui
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -80,51 +82,54 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
         items(viewModel.habitList.size) { item ->
             val habitName = viewModel.habitList[item].habitName
-            OutlinedCard(
-                elevation = CardDefaults.cardElevation(4.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-                    .aspectRatio(1f)
-                    .clickable {
-                        navController.navigate(
-                            "CounterPage/${habitName}"
-                        )
-                        viewModel.getTimeLogs(habitName)
-                    },
-                shape = RoundedCornerShape(35.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.onSurface
-                ),
-                border = BorderStroke(4.dp, Color.Black),
+            val habit = viewModel.getHabitFromId(habitName)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    Modifier
-                        .padding(6.dp)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp, 12.dp, 8.dp, 0.dp)
+                        .aspectRatio(1f)
+                        .combinedClickable(onClick = {
+                            navController.navigate(
+                                "CounterPage/${habitName}"
+                            )
+                            viewModel.getTimeLogs(habitName)
+                        }, onLongClick = {
+                            viewModel.onHabitLongClick(habit)
+                        }),
+                    shape = CircleShape,
                 ) {
-                    Text(
-                        text = viewModel.habitList[item].habitName,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.displayLarge,
-                    )
-                    Text(
-                        text = viewModel.habitList[item].count.toString(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.displayLarge,
-                    )
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = viewModel.habitList[item].count.toString(),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.displayLarge,
+                        )
+                    }
                 }
+                Text(
+                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
+                    text = viewModel.habitList[item].habitName,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.displaySmall,
+                )
             }
         }
     })
 }
+
 
 @Composable
 fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
