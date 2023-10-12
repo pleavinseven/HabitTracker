@@ -51,7 +51,7 @@ class MainViewModel(
         val habit = Habit(
             habitName, 0
         )
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.addHabit(habit)
         }
     }
