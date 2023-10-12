@@ -11,4 +11,5 @@ data class Habit (
     @PrimaryKey(autoGenerate = false)
     val habitName: String,
     var count: Int,
+    var goal: Int?,
 ) : Parcelable

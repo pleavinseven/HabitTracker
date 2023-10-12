@@ -8,7 +8,7 @@ import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.model.entities.Habit
 
 
-@Database(entities = [TimeLogModel::class, Habit::class], version = 2)
+@Database(entities = [TimeLogModel::class, Habit::class], version = 3)
 abstract class HabitDatabase : RoomDatabase() {
 
 

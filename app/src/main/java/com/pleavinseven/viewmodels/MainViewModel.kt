@@ -49,7 +49,7 @@ class MainViewModel(
 
     private fun addHabitToDB(habitName: String) {
         val habit = Habit(
-            habitName, 0
+            habitName, 0, null
         )
         viewModelScope.launch {
             repository.addHabit(habit)
