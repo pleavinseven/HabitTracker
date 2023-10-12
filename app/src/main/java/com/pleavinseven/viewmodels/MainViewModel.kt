@@ -9,12 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class MainViewModel(
-    private val repository: Repository, application: Application
+    private val repository: Repository,
+    application: Application,
 ) : AndroidViewModel(application) {
 
     var formattedTimeLogList by mutableStateOf(emptyList<String>())
@@ -33,7 +33,7 @@ class MainViewModel(
     fun onDecreaseButtonClicked(habit: Habit) {
         if (habit.count >= 1) {
             decreaseCount(habit)
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 repository.removeLastTimeLog(timeLogList.last())
             }
         }
@@ -65,14 +65,14 @@ class MainViewModel(
 
     private fun addCount(habit: Habit) {
         habit.count++
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.updateCount(habit)
         }
     }
 
     private fun decreaseCount(habit: Habit) {
         habit.count--
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.updateCount(habit)
         }
     }
@@ -89,7 +89,7 @@ class MainViewModel(
             seconds = currentTime.second,
             habitName = habitName
         )
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.addTimeLog(timeLogModel)
         }
     }
