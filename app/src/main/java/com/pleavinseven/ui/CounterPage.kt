@@ -1,5 +1,12 @@
 package com.pleavinseven.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,9 +41,9 @@ import com.pleavinseven.viewmodels.MainViewModel
 @Composable
 fun CounterPage(viewModel: MainViewModel, habitName: String) {
     val habit = viewModel.getHabitFromId(habitName)
-    val startCount = habit.count.toString()
+    val startCount = habit.count
     var count by remember {
-        mutableStateOf(startCount)
+        mutableIntStateOf(startCount)
     }
     viewModel.getTimeLogs(habitName)
     Box(
@@ -63,7 +70,7 @@ fun CounterPage(viewModel: MainViewModel, habitName: String) {
                 IconButton(
                     onClick = {
                         viewModel.onDecreaseButtonClicked(habit)
-                        count = habit.count.toString()
+                        count = habit.count
                     },
                     modifier = Modifier
                         .size(60.dp)
@@ -86,18 +93,37 @@ fun CounterPage(viewModel: MainViewModel, habitName: String) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            fontSize = 130.sp,
-                            text = count
-                        )
+                        AnimatedContent(
+                            targetState = count, transitionSpec = {
+                                if (targetState > initialState) {
+                                    // If the target number is larger, it slides up and fades in
+                                    // while the initial number slides up and fades out.
+                                    // else reverse
+                                    (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                                        slideOutVertically { height -> -height } + fadeOut())
+                                } else {
+                                    (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                                        slideOutVertically { height -> height } + fadeOut())
+                                }.using(
+                                    SizeTransform(clip = false)
+                                )
+                            }, label = ""
+                        ) { targetCount ->
+                            val countFontSize = when (targetCount) {
+                                in 0..9 -> 130.sp
+                                in 10..99 -> 100.sp
+                                in 100..999 -> 70.sp
+                                else -> 50.sp
+                            }
+                            Text(text = targetCount.toString(), fontSize = countFontSize)
+                        }
                     }
                 }
                 IconButton(
                     onClick = {
                         viewModel.onCountButtonClicked(habit)
-                        count = habit.count.toString()
-                    },
-                    modifier = Modifier
+                        count = habit.count
+                    }, modifier = Modifier
                         .weight(0.5f)
                         .size(60.dp)
                 ) {
