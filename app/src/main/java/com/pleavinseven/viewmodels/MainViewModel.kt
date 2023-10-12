@@ -47,6 +47,12 @@ class MainViewModel(
         return false
     }
 
+    fun onHabitLongClick(habit: Habit) {
+        viewModelScope.launch {
+            repository.deleteHabit(habit)
+        }
+    }
+
     private fun addHabitToDB(habitName: String) {
         val habit = Habit(
             habitName, 0, null
