@@ -39,8 +39,9 @@ import com.pleavinseven.R
 import com.pleavinseven.viewmodels.MainViewModel
 
 @Composable
-fun CounterPage(viewModel: MainViewModel, habitName: String) {
-    val habit = viewModel.getHabitFromId(habitName)
+fun CounterPage(viewModel: MainViewModel, habitId: Int) {
+    val habit = viewModel.getHabitFromId(habitId)
+    val habitName = habit.name
     val startCount = habit.count
     var count by remember {
         mutableIntStateOf(startCount)

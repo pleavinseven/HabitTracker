@@ -88,7 +88,7 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
         items(viewModel.habitList.size) { item ->
             val currentHabit = viewModel.habitList[item]
-            val habit = viewModel.getHabitFromId(currentHabit.habitName)
+            val habit = viewModel.getHabitFromId(currentHabit.id)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -99,9 +99,9 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                         .aspectRatio(1f)
                         .combinedClickable(onClick = {
                             navController.navigate(
-                                "CounterPage/${currentHabit.habitName}"
+                                "CounterPage/${currentHabit.id}"
                             )
-                            viewModel.getTimeLogs(currentHabit.habitName)
+                            viewModel.getTimeLogs(currentHabit.name)
                         }, onLongClick = {
                             viewModel.onHabitLongClick(habit)
                         }),
@@ -121,9 +121,9 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                 }
                 Text(
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
-                    text = currentHabit.habitName,
+                    text = currentHabit.name,
                     textAlign = TextAlign.Center,
-                    style = if (currentHabit.habitName.length < 10) {
+                    style = if (currentHabit.name.length < 10) {
                         MaterialTheme.typography.displaySmall
                     } else {
                         MaterialTheme.typography.titleLarge

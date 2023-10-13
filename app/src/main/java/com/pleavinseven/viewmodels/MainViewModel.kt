@@ -27,7 +27,7 @@ class MainViewModel(
 
     fun onCountButtonClicked(habit: Habit) {
         addCount(habit)
-        logTimeStampInDatabase(habit.habitName)
+        logTimeStampInDatabase(habit.name)
     }
 
     fun onDecreaseButtonClicked(habit: Habit) {
@@ -64,7 +64,7 @@ class MainViewModel(
 
     private fun checkHabitDuplicateOrEmpty(habitName: String): Boolean {
         if (habitName.isNotBlank()) {
-            return habitList.any { habit -> habit.habitName == habitName }
+            return habitList.any { habit -> habit.name == habitName }
         }
         return true
     }

@@ -19,7 +19,7 @@ interface TimeLogDao {
     suspend fun deleteTimeLog(timeLogModel: TimeLogModel)
 
     @Transaction
-    @Query("SELECT * FROM habit where habitName = :habitName")
+    @Query("SELECT * FROM habit where name = :habitName")
     fun getHabitWithTimeLogs(habitName: String): Flow<List<HabitWithTimeLogs>>
 
 }

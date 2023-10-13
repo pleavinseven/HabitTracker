@@ -8,7 +8,7 @@ import com.pleavinseven.model.entities.TimeLogModel
 data class HabitWithTimeLogs(
     @Embedded val habit: Habit,
     @Relation(
-        parentColumn = "habitName",
+        parentColumn = "name",
         entityColumn = "habitName"
     )
     val timeLogs: List<TimeLogModel>
