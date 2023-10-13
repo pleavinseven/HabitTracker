@@ -125,9 +125,9 @@ class MainViewModel(
         return "${currentTime.day}-${currentTime.month}-${currentTime.year} ${currentTime.hour}:${currentTime.min}"
     }
 
-    fun getHabitFromId(habitName: String): Habit {
+    fun getHabitFromId(id: Int): Habit {
         val habitFromId = habitList.find { habit ->
-            habitName == habit.habitName
+            id == habit.id
         }
         return habitFromId!!
     }

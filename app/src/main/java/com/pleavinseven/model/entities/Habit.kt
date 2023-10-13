@@ -8,8 +8,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "habit")
 data class Habit (
-    @PrimaryKey(autoGenerate = false)
-    val habitName: String,
+    @PrimaryKey(autoGenerate = true)
+    var id: Int,
+    var name: String,
     var count: Int,
     var goal: Int?,
 ) : Parcelable
