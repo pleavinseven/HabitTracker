@@ -76,7 +76,7 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.Filled.AddCircle,
-                contentDescription = stringResource(id = R.string.add_habit_description)
+                contentDescription = stringResource(id = R.string.confirm)
             )
         }
     }
@@ -99,9 +99,9 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                         .aspectRatio(1f)
                         .combinedClickable(onClick = {
                             navController.navigate(
-                                "CounterPage/${habitName}"
+                                "CounterPage/${currentHabit.habitName}"
                             )
-                            viewModel.getTimeLogs(habitName)
+                            viewModel.getTimeLogs(currentHabit.habitName)
                         }, onLongClick = {
                             viewModel.onHabitLongClick(habit)
                         }),
@@ -113,7 +113,7 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = viewModel.habitList[item].count.toString(),
+                            text = currentHabit.count.toString(),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.displayLarge,
                         )
@@ -121,9 +121,13 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                 }
                 Text(
                     modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
-                    text = viewModel.habitList[item].habitName,
+                    text = currentHabit.habitName,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.displaySmall,
+                    style = if (currentHabit.habitName.length < 10) {
+                        MaterialTheme.typography.displaySmall
+                    } else {
+                        MaterialTheme.typography.titleLarge
+                    },
                 )
             }
         }
