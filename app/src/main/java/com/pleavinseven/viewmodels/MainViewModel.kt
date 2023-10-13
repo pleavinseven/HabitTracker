@@ -39,7 +39,7 @@ class MainViewModel(
         }
     }
 
-    fun createHabitClicked(habitName: String): Boolean {
+    fun createHabitClicked(habitName: String, habitGoal: Int?): Boolean {
         if (!checkHabitDuplicateOrEmpty(habitName)) {
             addHabitToDB(habitName, habitGoal)
             return true
@@ -69,9 +69,9 @@ class MainViewModel(
         }
     }
 
-    private fun addHabitToDB(habitName: String) {
+    private fun addHabitToDB(habitName: String, habitGoal: Int?) {
         val habit = Habit(
-            habitName, 0, null
+            0, habitName, 0, habitGoal
         )
         viewModelScope.launch {
             repository.addHabit(habit)

@@ -141,6 +141,9 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
     var habitName by remember {
         mutableStateOf("")
     }
+    var habitGoal by remember {
+        mutableStateOf("")
+    }
     val context = LocalContext.current
     Popup(alignment = Alignment.Center, properties = PopupProperties(
         focusable = true,
