@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">HabitTracker</string>
-    <string name="add_habit_description">add new habit</string>
-    <string name="create_habit">create habit</string>
-    <string name="add_habit_name">New Habit Name:</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit_habit_description">Edit habit</string>
+    <string name="create_habit">Create habit</string>
+    <string name="habit_name">Habit Name:</string>
     <string name="habit_already_exists">Habit empty or already exists. Try another name</string>
+    <string name="count_plus_one">Count plus one</string>
+    <string name="count_minus_one">Count minus one</string>
 </resources>
