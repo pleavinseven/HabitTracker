@@ -35,9 +35,9 @@ class MainViewModelTest {
     private lateinit var mockRepository: Repository
     private lateinit var viewModel: MainViewModel
     private val testHabitList = mutableListOf(
-        Habit("Habit 1", 0, null), Habit("Habit 2", 1, null)
+        Habit(0, "Habit 1", 0, null), Habit(0, "Habit 2", 1, null)
     )
-    private val testHabit = Habit("testHabit", 0, null)
+    private val testHabit = Habit(0, "testHabit", 0, null)
     private val mockTimeLogList = listOf(mockk<TimeLogModel>())
     private val currentTime: LocalDateTime = LocalDateTime.now()
     private val timeLogModel = TimeLogModel(
@@ -48,7 +48,7 @@ class MainViewModelTest {
         hour = currentTime.hour,
         min = currentTime.minute,
         seconds = currentTime.second,
-        habitName = testHabit.habitName
+        habitName = testHabit.name
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -74,10 +74,10 @@ class MainViewModelTest {
 
     @Test
     fun testAddHabitToDB() {
-        viewModel.createHabitClicked(testHabit.habitName)
+        viewModel.createHabitClicked(testHabit.name, 3)
         coVerify {
             mockRepository.addHabit(match {
-                it.habitName == testHabit.habitName && it.count == 0
+                it.name == testHabit.name && it.count == 0
             })
         }
     }
@@ -93,7 +93,7 @@ class MainViewModelTest {
         assertEquals(1, testHabit.count)
         coVerify {
             mockRepository.updateCount(match {
-                it.habitName == testHabit.habitName && it.count == 1
+                it.name == testHabit.name && it.count == 1
             })
         }
     }
@@ -116,7 +116,7 @@ class MainViewModelTest {
         assertEquals(0, testHabit.count)
         coVerify {
             mockRepository.updateCount(match {
-                it.habitName == testHabit.habitName && it.count == 0
+                it.name == testHabit.name && it.count == 0
             })
         }
     }
