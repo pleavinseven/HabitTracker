@@ -35,9 +35,9 @@ class MainViewModelTest {
     private lateinit var mockRepository: Repository
     private lateinit var viewModel: MainViewModel
     private val testHabitList = mutableListOf(
-        Habit("Habit 1", 0), Habit("Habit 2", 1)
+        Habit("Habit 1", 0, null), Habit("Habit 2", 1, null)
     )
-    private val testHabit = Habit("testHabit", 0)
+    private val testHabit = Habit("testHabit", 0, null)
     private val mockTimeLogList = listOf(mockk<TimeLogModel>())
     private val currentTime: LocalDateTime = LocalDateTime.now()
     private val timeLogModel = TimeLogModel(
