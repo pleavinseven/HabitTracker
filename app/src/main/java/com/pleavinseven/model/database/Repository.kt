@@ -34,6 +34,10 @@ class Repository(
         habitDao.deleteHabit(habit)
     }
 
+    suspend fun updateHabit(habit: Habit) = withContext(dispatcher) {
+        habitDao.updateHabit(habit)
+    }
+
     suspend fun updateCount(habit: Habit) = withContext(dispatcher) {
         habitDao.updateCount(habit)
     }

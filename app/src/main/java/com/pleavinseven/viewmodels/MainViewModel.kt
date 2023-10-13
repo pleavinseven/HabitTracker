@@ -41,10 +41,26 @@ class MainViewModel(
 
     fun createHabitClicked(habitName: String): Boolean {
         if (!checkHabitDuplicateOrEmpty(habitName)) {
-            addHabitToDB(habitName)
+            addHabitToDB(habitName, habitGoal)
             return true
         }
         return false
+    }
+    
+    fun updateHabitClicked(habit: Habit, habitName: String, habitGoal: Int?): Boolean {
+        if (habitName.isNotBlank()) {
+            habit.name = habitName
+            habit.goal = habitGoal
+            updateHabitInDB(habit)
+            return true
+        }
+        return false
+    }
+
+    private fun updateHabitInDB(habit: Habit) {
+        viewModelScope.launch {
+            repository.updateHabit(habit)
+        }
     }
 
     fun onHabitLongClick(habit: Habit) {
