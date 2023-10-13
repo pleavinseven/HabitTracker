@@ -87,8 +87,8 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
 fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
         items(viewModel.habitList.size) { item ->
-            val habitName = viewModel.habitList[item].habitName
-            val habit = viewModel.getHabitFromId(habitName)
+            val currentHabit = viewModel.habitList[item]
+            val habit = viewModel.getHabitFromId(currentHabit.habitName)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
