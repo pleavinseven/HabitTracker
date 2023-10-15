@@ -71,7 +71,11 @@ fun CounterPage(viewModel: MainViewModel, habitId: Int) {
     }
     viewModel.getTimeLogs(habitName)
     Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        contentAlignment = Alignment.Center
     ) {
         if (showPopupWindow) {
             EditHabitDialog(viewModel, habit) { showPopupWindow = false }

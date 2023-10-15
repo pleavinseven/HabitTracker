@@ -59,7 +59,9 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         mutableStateOf((false))
     }
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
     ) {
         if (showPopupWindow) {
             AddHabitPopUp(viewModel) { showPopupWindow = false }
