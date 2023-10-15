@@ -63,7 +63,7 @@ class MainViewModel(
         }
     }
 
-    fun onHabitLongClick(habit: Habit) {
+    fun onHabitConfirmDeleteClick(habit: Habit) {
         viewModelScope.launch {
             repository.deleteHabit(habit)
         }

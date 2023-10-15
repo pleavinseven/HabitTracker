@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.pleavinseven.R
+import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
@@ -88,7 +89,12 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
         items(viewModel.habitList.size) { item ->
             val currentHabit = viewModel.habitList[item]
-            val habit = viewModel.getHabitFromId(currentHabit.id)
+            var showDeleteDialog by remember {
+                mutableStateOf((false))
+            }
+            if (showDeleteDialog) {
+                DeleteHabitDialog(viewModel, currentHabit) { showDeleteDialog = false }
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -103,7 +109,7 @@ fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
                             )
                             viewModel.getTimeLogs(currentHabit.name)
                         }, onLongClick = {
-                            viewModel.onHabitLongClick(habit)
+                            showDeleteDialog = true
                         }),
                     shape = CircleShape,
                 ) {
@@ -168,10 +174,10 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                     modifier = Modifier.padding(8.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
-                Row (
+                Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
-                ){
+                ) {
                     IconButton(
                         onClick = { onDismiss() },
                         modifier = Modifier.padding(8.dp)
@@ -185,7 +191,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                     }
                     IconButton(
                         onClick = {
-                            val habitGoalInt = if (habitGoal == ""){
+                            val habitGoalInt = if (habitGoal == "") {
                                 null
                             } else {
                                 habitGoal.toInt()
@@ -197,6 +203,55 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                             } else {
                                 onDismiss()
                             }
+                        },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = stringResource(id = R.string.confirm),
+                            modifier = Modifier
+                                .size(40.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Unit) {
+    Dialog(
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            modifier = Modifier.clip(RoundedCornerShape(24.dp)),
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(id = R.string.delete_habit),
+                    modifier = Modifier.padding(8.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(
+                        onClick = { onDismiss() },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = stringResource(id = R.string.cancel),
+                            modifier = Modifier
+                                .size(40.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            viewModel.onHabitConfirmDeleteClick(habit)
                         },
                         modifier = Modifier.padding(8.dp)
                     ) {
