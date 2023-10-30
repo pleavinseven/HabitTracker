@@ -112,7 +112,7 @@ fun CounterPage(viewModel: MainViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
