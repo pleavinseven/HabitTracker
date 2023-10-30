@@ -87,59 +87,64 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HabitLazyGrid(viewModel: MainViewModel, navController: NavController) {
-    LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
-        items(viewModel.habitList.size) { item ->
-            val currentHabit = viewModel.habitList[item]
-            var showDeleteDialog by remember {
-                mutableStateOf((false))
-            }
-            if (showDeleteDialog) {
-                DeleteHabitDialog(viewModel, currentHabit) { showDeleteDialog = false }
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp, 12.dp, 8.dp, 0.dp)
-                        .aspectRatio(1f)
-                        .combinedClickable(onClick = {
-                            navController.navigate(
-                                "CounterPage/${currentHabit.id}"
-                            )
-                            viewModel.getTimeLogs(currentHabit.name)
-                        }, onLongClick = {
-                            showDeleteDialog = true
-                        }),
-                    shape = CircleShape,
-                ) {
-                    Column(
-                        Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = currentHabit.count.toString(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.displayLarge,
-                        )
-                    }
+fun HabitLazyGrid(
+    viewModel: MainViewModel, navController: NavController, paddingValues: PaddingValues
+) {
+    LazyVerticalGrid(modifier = Modifier.padding(paddingValues),
+        columns = GridCells.Fixed(2),
+        content = {
+            items(viewModel.habitList.size) { item ->
+                val currentHabit = viewModel.habitList[item]
+                var showDeleteDialog by remember {
+                    mutableStateOf((false))
                 }
-                Text(
-                    modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
-                    text = currentHabit.name,
-                    textAlign = TextAlign.Center,
-                    style = if (currentHabit.name.length < 10) {
-                        MaterialTheme.typography.displaySmall
-                    } else {
-                        MaterialTheme.typography.titleLarge
-                    },
-                )
+                if (showDeleteDialog) {
+                    DeleteHabitDialog(viewModel, currentHabit) { showDeleteDialog = false }
+                }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp, 12.dp, 8.dp, 0.dp)
+                            .aspectRatio(1f)
+                            .combinedClickable(onClick = {
+                                viewModel.setCurrentHabit(currentHabit)
+                                navController.navigate(
+                                    "CounterPage"
+                                )
+                                viewModel.getTimeLogs(currentHabit.name)
+                            }, onLongClick = {
+                                showDeleteDialog = true
+                            }),
+                        shape = CircleShape,
+                    ) {
+                        Column(
+                            Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = currentHabit.count.toString(),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.displayLarge,
+                            )
+                        }
+                    }
+                    Text(
+                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
+                        text = currentHabit.name,
+                        textAlign = TextAlign.Center,
+                        style = if (currentHabit.name.length < 10) {
+                            MaterialTheme.typography.displaySmall
+                        } else {
+                            MaterialTheme.typography.titleLarge
+                        },
+                    )
+                }
             }
-        }
-    })
+        })
 }
 
 
@@ -187,8 +192,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                         Icon(
                             imageVector = Icons.Filled.Cancel,
                             contentDescription = stringResource(id = R.string.cancel),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                     IconButton(
@@ -211,8 +215,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = stringResource(id = R.string.confirm),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                 }
@@ -247,8 +250,7 @@ fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> U
                         Icon(
                             imageVector = Icons.Filled.Cancel,
                             contentDescription = stringResource(id = R.string.cancel),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                     IconButton(
@@ -260,8 +262,7 @@ fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> U
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = stringResource(id = R.string.confirm),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                 }

@@ -13,9 +13,8 @@ fun HabitTrackerApp(viewModel: MainViewModel) {
         composable("HabitsPage") {
             HabitsPage(viewModel = viewModel, navController)
         }
-        composable("CounterPage/{habitId}") { backStackEntry ->
-            backStackEntry.arguments?.getString("habitId")
-                ?.let { CounterPage(viewModel = viewModel, it.toInt()) }
+        composable("CounterPage") {
+            CounterPage(viewModel = viewModel)
         }
     }
 }

@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -20,9 +22,14 @@ class MainViewModel(
     var formattedTimeLogList by mutableStateOf(emptyList<String>())
     var timeLogList by mutableStateOf(emptyList<TimeLogModel>())
     var habitList by mutableStateOf(emptyList<Habit>())
+    val habitState: StateFlow<Habit> = MutableStateFlow(Habit(0, "No Habit Selected", 0, null))
 
     init {
         getHabits()
+    }
+
+    fun setCurrentHabit(habit: Habit) {
+        (habitState as MutableStateFlow).value = habit
     }
 
     fun onCountButtonClicked(habit: Habit) {

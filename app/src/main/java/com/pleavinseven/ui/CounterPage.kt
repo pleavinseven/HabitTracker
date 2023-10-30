@@ -59,8 +59,8 @@ import com.pleavinseven.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun CounterPage(viewModel: MainViewModel, habitId: Int) {
-    val habit = viewModel.getHabitFromId(habitId)
+fun CounterPage(viewModel: MainViewModel) {
+    val habit by viewModel.habitState.collectAsState()
     val habitName = habit.name
     val startCount = habit.count
     var count by remember {
