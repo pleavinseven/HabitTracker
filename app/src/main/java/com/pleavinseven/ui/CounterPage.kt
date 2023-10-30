@@ -70,13 +70,34 @@ fun CounterPage(viewModel: MainViewModel) {
         mutableStateOf((false))
     }
     viewModel.getTimeLogs(habitName)
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        contentAlignment = Alignment.Center
-    ) {
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .statusBarsPadding()
+        .navigationBarsPadding(),
+        topBar = {
+            TopAppBar(title = {}, navigationIcon = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Menu,
+                        contentDescription = stringResource(id = R.string.confirm),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    showPopupWindow = !showPopupWindow
+                }, Modifier.clip(RoundedCornerShape(45.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = stringResource(id = R.string.edit_habit_description),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }) { innerPadding ->
         if (showPopupWindow) {
             EditHabitDialog(viewModel, habit) { showPopupWindow = false }
         }
