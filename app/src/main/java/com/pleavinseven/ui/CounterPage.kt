@@ -120,6 +120,7 @@ fun CounterPage(viewModel: MainViewModel) {
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.displayLarge,
             )
+            // Counter
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -142,7 +143,7 @@ fun CounterPage(viewModel: MainViewModel) {
                         contentDescription = stringResource(id = R.string.count_minus_one)
                     )
                 }
-                Surface(
+                Card(
                     modifier = Modifier
                         .weight(1f)
                         .aspectRatio(1f),
@@ -214,17 +215,16 @@ fun CounterPage(viewModel: MainViewModel) {
 }
 
 @Composable
-fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Unit,) {
+fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     val habitName = habit.name
     var editHabitName by remember {
         mutableStateOf(habitName)
     }
     var editHabitGoal by remember {
-        if (habit.goal == null){
+        if (habit.goal == null) {
             mutableStateOf("0")
-        }
-        else {
+        } else {
             mutableStateOf(habit.goal.toString())
         }
     }
@@ -232,7 +232,7 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
     Dialog(
         onDismissRequest = onDismiss
     ) {
-        Surface {
+        Card {
             Column {
                 OutlinedTextField(
                     value = editHabitName,
@@ -252,10 +252,10 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
                     modifier = Modifier.padding(8.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
-                Row (
+                Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
-                ){
+                ) {
                     IconButton(
                         onClick = { onDismiss() },
                         modifier = Modifier.padding(8.dp)
@@ -263,8 +263,7 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
                         Icon(
                             imageVector = Icons.Filled.Cancel,
                             contentDescription = stringResource(id = R.string.cancel),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                     IconButton(
@@ -287,8 +286,7 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = stringResource(id = R.string.confirm),
-                            modifier = Modifier
-                                .size(40.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                 }
