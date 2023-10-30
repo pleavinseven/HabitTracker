@@ -3,14 +3,16 @@ package com.pleavinseven.ui
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -20,13 +22,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,35 +59,44 @@ import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
     var showPopupWindow by remember {
         mutableStateOf((false))
     }
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-    ) {
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .statusBarsPadding()
+        .navigationBarsPadding(),
+        topBar = {
+            TopAppBar(title = {}, navigationIcon = {
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Menu,
+                        contentDescription = stringResource(id = R.string.confirm),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    showPopupWindow = !showPopupWindow
+                }, Modifier.clip(RoundedCornerShape(45.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = stringResource(id = R.string.confirm),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }) { innerPadding ->
         if (showPopupWindow) {
             AddHabitPopUp(viewModel) { showPopupWindow = false }
         }
-        HabitLazyGrid(viewModel = viewModel, navController = navController)
-        FloatingActionButton(
-            onClick = {
-                showPopupWindow = !showPopupWindow
-            },
-            Modifier
-                .align(Alignment.BottomEnd)
-                .padding(12.dp)
-                .clip(RoundedCornerShape(45.dp))
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = stringResource(id = R.string.confirm),
-                modifier = Modifier.size(40.dp)
-            )
-        }
+        HabitLazyGrid(viewModel = viewModel, navController = navController, innerPadding)
     }
 }
 
@@ -161,7 +176,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss
     ) {
-        Surface {
+        Card {
             Column {
                 OutlinedTextField(
                     value = habitName,
@@ -229,7 +244,7 @@ fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> U
     Dialog(
         onDismissRequest = onDismiss,
     ) {
-        Surface(
+        Card(
             modifier = Modifier.clip(RoundedCornerShape(24.dp)),
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
