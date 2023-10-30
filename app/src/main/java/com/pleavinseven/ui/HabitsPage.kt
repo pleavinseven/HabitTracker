@@ -271,8 +271,8 @@ fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> U
                     IconButton(
                         onClick = {
                             viewModel.onHabitConfirmDeleteClick(habit)
-                        },
-                        modifier = Modifier.padding(8.dp)
+                            onDismiss()
+                        }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
