@@ -21,6 +21,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
@@ -159,11 +161,25 @@ class MainViewModelTest {
     @Test
     fun testUpdateHabitClicked(){
         val newName = "new name"
+        val emptyName = ""
+        val sameName = testHabit.name
+        val goal = 3
         val newGoal = 5
-        viewModel.updateHabitClicked(testHabit, newName, newGoal)
+        // test empty name, same name and new name
+        val resultEmpty = viewModel.updateHabitClicked(testHabit, emptyName, newGoal)
+        assertFalse(resultEmpty)
+        val resultSame = viewModel.updateHabitClicked(testHabit, sameName, goal)
+        assertTrue(resultSame)
         coVerify {
             mockRepository.updateHabit(match {
-                it.name == newName && it.count == 0 && it.goal == newGoal
+                it.name == sameName && it.count == testHabit.count && it.goal == goal
+            })
+        }
+        val resultNew = viewModel.updateHabitClicked(testHabit, newName, newGoal)
+        assertTrue(resultNew)
+        coVerify {
+            mockRepository.updateHabit(match {
+                it.name == newName && it.count == testHabit.count && it.goal == newGoal
             })
         }
     }
