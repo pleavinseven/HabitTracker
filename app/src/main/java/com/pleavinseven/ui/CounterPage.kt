@@ -123,7 +123,7 @@ fun CounterPage(viewModel: MainViewModel) {
             // Counter
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .padding(8.dp, 30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
