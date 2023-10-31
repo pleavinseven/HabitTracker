@@ -7,8 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -71,12 +74,26 @@ fun CounterPage(viewModel: MainViewModel) {
     val habit by viewModel.habitState.collectAsState()
     val habitName = habit.name
     val startCount = habit.count
+    val goal = habit.goal
     var count by remember {
         mutableIntStateOf(startCount)
     }
     var showPopupWindow by remember {
         mutableStateOf((false))
     }
+    val showGoal = goal != null
+    val grey = MaterialTheme.colorScheme.onBackground
+    val green = Color(0xFF388E3C)
+    val startGoalColor =
+        if(showGoal) {
+            if (count < goal!!) grey else green
+        } else {
+            Color.Transparent
+        }
+    var goalColor by remember {
+        mutableStateOf(startGoalColor)
+    }
+
     viewModel.getTimeLogs(habitName)
     Scaffold(modifier = Modifier
         .fillMaxSize()
@@ -132,6 +149,9 @@ fun CounterPage(viewModel: MainViewModel) {
                     onClick = {
                         viewModel.onDecreaseButtonClicked(habit)
                         count = habit.count
+                        if(showGoal) {
+                            if (goal!! > count) goalColor = grey
+                        }
                     },
                     modifier = Modifier
                         .size(60.dp)
@@ -184,6 +204,9 @@ fun CounterPage(viewModel: MainViewModel) {
                     onClick = {
                         viewModel.onCountButtonClicked(habit)
                         count = habit.count
+                        if(showGoal) {
+                            if (goal!! <= count) goalColor = green
+                        }
                     }, modifier = Modifier
                         .weight(0.5f)
                         .size(60.dp)
@@ -195,21 +218,28 @@ fun CounterPage(viewModel: MainViewModel) {
                     )
                 }
             }
-        }
-        FloatingActionButton(
-            onClick = {
-                showPopupWindow = !showPopupWindow
-            },
-            Modifier
-                .align(Alignment.BottomEnd)
-                .padding(12.dp)
-                .clip(RoundedCornerShape(45.dp))
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = stringResource(id = R.string.edit_habit_description),
-                modifier = Modifier.size(40.dp)
-            )
+            if (showGoal) {
+                Card(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .padding(horizontal = 28.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(goalColor)
+                                .wrapContentHeight(),
+                            text = "Goal $goal",
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+                        )
+                    }
+                }
+            }
         }
     }
 }
