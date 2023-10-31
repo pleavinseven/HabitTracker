@@ -156,4 +156,16 @@ class MainViewModelTest {
         }
     }
 
+    @Test
+    fun testUpdateHabitClicked(){
+        val newName = "new name"
+        val newGoal = 5
+        viewModel.updateHabitClicked(testHabit, newName, newGoal)
+        coVerify {
+            mockRepository.updateHabit(match {
+                it.name == newName && it.count == 0 && it.goal == newGoal
+            })
+        }
+    }
+
 }
