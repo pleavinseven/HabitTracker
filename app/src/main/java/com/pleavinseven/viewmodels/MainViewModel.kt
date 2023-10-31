@@ -66,17 +66,31 @@ class MainViewModel(
         return false
     }
 
+    fun onHabitConfirmDeleteClick(habit: Habit) {
+        viewModelScope.launch {
+            repository.deleteHabit(habit)
+        }
+    }
+
+    fun getTimeLogs(habitName: String) {
+        viewModelScope.launch {
+            repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
+                for (habitWithTimeLog in habitWithTimeLogsList) {
+                    timeLogList = habitWithTimeLog.timeLogs
+                    formattedTimeLogList = habitWithTimeLog.timeLogs.map { item ->
+                        formatReadableTime(item)
+                    }
+                }
+            }
+        }
+    }
+
     private fun updateHabitInDB(habit: Habit) {
         viewModelScope.launch {
             repository.updateHabit(habit)
         }
     }
 
-    fun onHabitConfirmDeleteClick(habit: Habit) {
-        viewModelScope.launch {
-            repository.deleteHabit(habit)
-        }
-    }
 
     private fun addHabitToDB(habitName: String, habitGoal: Int?) {
         val habit = Habit(
@@ -128,19 +142,6 @@ class MainViewModel(
         viewModelScope.launch {
             repository.getHabits().collect { habitListFlow ->
                 habitList = habitListFlow
-            }
-        }
-    }
-
-    fun getTimeLogs(habitName: String) {
-        viewModelScope.launch {
-            repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
-                for (habitWithTimeLog in habitWithTimeLogsList) {
-                    timeLogList = habitWithTimeLog.timeLogs
-                    formattedTimeLogList = habitWithTimeLog.timeLogs.map { item ->
-                        formatReadableTime(item)
-                    }
-                }
             }
         }
     }
