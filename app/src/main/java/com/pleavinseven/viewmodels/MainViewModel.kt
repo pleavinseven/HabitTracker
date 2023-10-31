@@ -99,16 +99,12 @@ class MainViewModel(
 
     private fun addCount(habit: Habit) {
         habit.count++
-        viewModelScope.launch {
-            repository.updateCount(habit)
-        }
+        updateHabitInDB(habit)
     }
 
     private fun decreaseCount(habit: Habit) {
         habit.count--
-        viewModelScope.launch {
-            repository.updateCount(habit)
-        }
+        updateHabitInDB(habit)
     }
 
     private fun logTimeStampInDatabase(habitName: String) {
