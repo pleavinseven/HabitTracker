@@ -57,11 +57,12 @@ class MainViewModelTest {
         Dispatchers.setMain(testDispatcher)
         mockRepository = mockk()
         coEvery { mockRepository.getHabits() } returns flowOf(testHabitList)
-        coEvery { mockRepository.updateCount(any()) } returns Unit
+        coEvery { mockRepository.updateHabit(any()) } returns Unit
         coEvery { mockRepository.addTimeLog(any()) } returns Unit
         coEvery { mockRepository.getHabitWithTimeLogs(any()) } returns flowOf()
         coEvery { mockRepository.addHabit(any()) } returns Unit
         coEvery { mockRepository.removeLastTimeLog(any()) } returns Unit
+        coEvery { mockRepository.deleteHabit(any()) } returns Unit
         launch { viewModel = MainViewModel(mockRepository, applicationMock) }
     }
 
@@ -92,7 +93,7 @@ class MainViewModelTest {
         viewModel.onCountButtonClicked(testHabit)
         assertEquals(1, testHabit.count)
         coVerify {
-            mockRepository.updateCount(match {
+            mockRepository.updateHabit(match {
                 it.name == testHabit.name && it.count == 1
             })
         }
@@ -104,7 +105,7 @@ class MainViewModelTest {
         viewModel.onDecreaseButtonClicked(testHabit)
         assertEquals(0, testHabit.count)
         coVerify(exactly = 0) {
-            mockRepository.updateCount(any())
+            mockRepository.updateHabit(testHabit)
         }
     }
 
@@ -115,7 +116,7 @@ class MainViewModelTest {
         viewModel.onDecreaseButtonClicked(testHabit)
         assertEquals(0, testHabit.count)
         coVerify {
-            mockRepository.updateCount(match {
+            mockRepository.updateHabit(match {
                 it.name == testHabit.name && it.count == 0
             })
         }
@@ -135,13 +136,24 @@ class MainViewModelTest {
         coVerify {
             mockRepository.addTimeLog(match {
                 it.year == timeLogModel.year &&
-                        it.month == timeLogModel.month &&
-                        it.day == timeLogModel.day &&
-                        it.hour == timeLogModel.hour &&
-                        it.min == timeLogModel.min &&
-                        it.seconds == timeLogModel.seconds &&
-                        it.habitName == timeLogModel.habitName
+                it.month == timeLogModel.month &&
+                it.day == timeLogModel.day &&
+                it.hour == timeLogModel.hour &&
+                it.min == timeLogModel.min &&
+                it.seconds == timeLogModel.seconds &&
+                it.habitName == timeLogModel.habitName
             })
         }
     }
+
+    @Test
+    fun testOnHabitConfirmDeleteClick(){
+        viewModel.onHabitConfirmDeleteClick(testHabit)
+        coVerify {
+            mockRepository.deleteHabit(match {
+                it.name == testHabit.name && it.count == testHabit.count
+            })
+        }
+    }
+
 }
