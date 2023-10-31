@@ -268,11 +268,12 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
                     }
                     IconButton(
                         onClick = {
-                            val habitGoalInt = if (editHabitGoal == ""){
+                            val habitGoalInt = if (editHabitGoal == "") {
                                 null
                             } else {
                                 editHabitGoal.toInt()
                             }
+                            // checks if habit is updatable and either updates or returns toast
                             if (!viewModel.updateHabitClicked(habit, editHabitName, habitGoalInt)) {
                                 scope.launch {
                                     Utils.showToastShort(context, R.string.habit_already_exists)
