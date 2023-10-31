@@ -38,10 +38,6 @@ class Repository(
         habitDao.updateHabit(habit)
     }
 
-    suspend fun updateCount(habit: Habit) = withContext(dispatcher) {
-        habitDao.updateCount(habit)
-    }
-
     suspend fun removeLastTimeLog(timeLogModel: TimeLogModel) = withContext(dispatcher) {
         timeLogDao.deleteTimeLog(timeLogModel)
     }

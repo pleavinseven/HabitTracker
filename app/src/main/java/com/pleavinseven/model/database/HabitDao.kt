@@ -20,9 +20,6 @@ interface HabitDao {
     fun getHabits(): Flow<List<Habit>>
 
     @Update
-    suspend fun updateCount(habit: Habit)
-
-    @Update
     suspend fun updateHabit(habit: Habit)
 
     @Delete
