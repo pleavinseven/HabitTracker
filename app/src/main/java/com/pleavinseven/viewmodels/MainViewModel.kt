@@ -47,15 +47,17 @@ class MainViewModel(
     }
 
     fun createHabitClicked(habitName: String, habitGoal: Int?): Boolean {
-        if (!checkHabitDuplicateOrEmpty(habitName)) {
+        if (!isHabitDuplicateOrEmpty(habitName)) {
             addHabitToDB(habitName, habitGoal)
             return true
         }
         return false
     }
-    
-    fun updateHabitClicked(habit: Habit, habitName: String, habitGoal: Int?): Boolean {
-        if (habitName.isNotBlank()) {
+
+    fun updateHabitClicked(
+        // if new name is allowed update and return true else return false
+        habit: Habit, habitName: String, habitGoal: Int?): Boolean {
+        if (!isHabitDuplicateOrEmpty(habitName, habit)) {
             habit.name = habitName
             habit.goal = habitGoal
             updateHabitInDB(habit)
@@ -85,9 +87,12 @@ class MainViewModel(
         }
     }
 
-    private fun checkHabitDuplicateOrEmpty(habitName: String): Boolean {
+    private fun isHabitDuplicateOrEmpty(habitName: String, habit: Habit? = null): Boolean {
+        if (habit?.name == habitName) {
+            return false
+        }
         if (habitName.isNotBlank()) {
-            return habitList.any { habit -> habit.name == habitName }
+            return habitList.any { currentHabit -> currentHabit.name == habitName }
         }
         return true
     }
