@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
+import com.pleavinseven.workers.ResetWorkManagerScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +23,8 @@ class MainViewModel(
     var formattedTimeLogList by mutableStateOf(emptyList<String>())
     var timeLogList by mutableStateOf(emptyList<TimeLogModel>())
     var habitList by mutableStateOf(emptyList<Habit>())
-    val habitState: StateFlow<Habit> = MutableStateFlow(Habit(0, "No Habit Selected", 0, null))
+    val habitState: StateFlow<Habit> = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
+    private val resetWorkManagerScheduler: ResetWorkManagerScheduler = ResetWorkManagerScheduler(application)
 
     init {
         getHabits()
@@ -46,9 +48,10 @@ class MainViewModel(
         }
     }
 
-    fun createHabitClicked(habitName: String, habitGoal: Int?): Boolean {
+    fun createHabitClicked(habitName: String, habitGoal: Int?, habitRepeat: Long): Boolean {
         if (!isHabitDuplicateOrEmpty(habitName)) {
-            addHabitToDB(habitName, habitGoal)
+            addHabitToDB(habitName, habitGoal, habitRepeat)
+            resetWorkManagerScheduler.scheduleLogAndReset(habitName, habitRepeat)
             return true
         }
         return false
