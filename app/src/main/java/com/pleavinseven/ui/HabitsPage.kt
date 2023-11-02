@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -172,6 +173,9 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
     var habitGoal by remember {
         mutableStateOf("")
     }
+    val habitRepeat by remember {
+        mutableLongStateOf(1)
+    }
     val context = LocalContext.current
     Dialog(
         onDismissRequest = onDismiss
@@ -217,7 +221,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                             } else {
                                 habitGoal.toInt()
                             }
-                            if (!viewModel.createHabitClicked(habitName, habitGoalInt)) {
+                            if (!viewModel.createHabitClicked(habitName, habitGoalInt, habitRepeat)) {
                                 scope.launch {
                                     Utils.showToastShort(context, R.string.habit_already_exists)
                                 }

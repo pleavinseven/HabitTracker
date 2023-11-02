@@ -95,9 +95,9 @@ class MainViewModel(
     }
 
 
-    private fun addHabitToDB(habitName: String, habitGoal: Int?) {
+    private fun addHabitToDB(habitName: String, habitGoal: Int?, habitRepeat: Long) {
         val habit = Habit(
-            0, habitName, 0, habitGoal
+            0, habitName, 0, habitGoal, habitRepeat
         )
         viewModelScope.launch {
             repository.addHabit(habit)
