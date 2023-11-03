@@ -72,7 +72,7 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         .navigationBarsPadding(),
         topBar = {
             TopAppBar(title = {}, navigationIcon = {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Rounded.Menu,
                         contentDescription = stringResource(id = R.string.confirm),
@@ -111,6 +111,9 @@ fun HabitLazyGrid(
         content = {
             items(viewModel.habitList.size) { item ->
                 val currentHabit = viewModel.habitList[item]
+                val currentName = currentHabit.name
+                val topPadding = if (currentName.length < 10) 0.dp else 4.dp
+                val fontSize = if (currentName.length < 10) 36.sp else 32.sp
                 var showDeleteDialog by remember {
                     mutableStateOf((false))
                 }
@@ -149,18 +152,15 @@ fun HabitLazyGrid(
                         }
                     }
                     Text(
-                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 4.dp),
+                        modifier = Modifier.padding(0.dp, topPadding, 0.dp, 4.dp),
                         text = currentHabit.name,
                         textAlign = TextAlign.Center,
-                        style = if (currentHabit.name.length < 10) {
-                            MaterialTheme.typography.displaySmall
-                        } else {
-                            MaterialTheme.typography.titleLarge
-                        },
+                        style = TextStyle(fontSize = fontSize)
                     )
                 }
             }
-        })
+        }
+    )
 }
 
 
@@ -221,7 +221,12 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                             } else {
                                 habitGoal.toInt()
                             }
-                            if (!viewModel.createHabitClicked(habitName, habitGoalInt, habitRepeat)) {
+                            if (!viewModel.createHabitClicked(
+                                    habitName,
+                                    habitGoalInt,
+                                    habitRepeat
+                                )
+                            ) {
                                 scope.launch {
                                     Utils.showToastShort(context, R.string.habit_already_exists)
                                 }
