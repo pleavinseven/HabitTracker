@@ -93,6 +93,7 @@ fun CounterPage(viewModel: MainViewModel) {
     var goalColor by remember {
         mutableStateOf(startGoalColor)
     }
+    val fontSize = if (habitName.length < 10) 36.sp else 32.sp
 
     viewModel.getTimeLogs(habitName)
     Scaffold(modifier = Modifier
@@ -135,7 +136,7 @@ fun CounterPage(viewModel: MainViewModel) {
             Text(
                 text = habitName.uppercase(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.displayLarge,
+                style = TextStyle(fontSize = fontSize),
             )
             // Counter
             Row(
