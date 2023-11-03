@@ -61,9 +61,11 @@ class MainViewModel(
         // if new name is allowed update and return true else return false
         habit: Habit, habitName: String, habitGoal: Int?): Boolean {
         if (!isHabitDuplicateOrEmpty(habitName, habit)) {
+            resetWorkManagerScheduler.cancel(habit.name)
             habit.name = habitName
             habit.goal = habitGoal
             updateHabitInDB(habit)
+            resetWorkManagerScheduler.scheduleLogAndReset(habitName, 1)
             return true
         }
         return false
@@ -73,6 +75,7 @@ class MainViewModel(
         viewModelScope.launch {
             repository.deleteHabit(habit)
         }
+        resetWorkManagerScheduler.cancel(habit.name)
     }
 
     fun getTimeLogs(habitName: String) {

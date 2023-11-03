@@ -30,4 +30,8 @@ class ResetWorkManagerScheduler(private val context: Context) : WorkManagerSched
                 .build()
         )
     }
+
+    override fun cancel(habitName: String) {
+        WorkManager.getInstance(context).cancelUniqueWork("WorkName_$habitName")
+    }
 }
