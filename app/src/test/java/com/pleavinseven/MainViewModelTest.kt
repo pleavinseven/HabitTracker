@@ -5,6 +5,7 @@ import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.viewmodels.MainViewModel
+import com.pleavinseven.workers.ResetWorkManagerScheduler
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -31,15 +32,18 @@ class MainViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val applicationMock = mockk<Application> {
-        every { applicationContext } returns mockk()
-    }
+
+    private lateinit var mockApplication: Application
     private lateinit var mockRepository: Repository
+    private lateinit var mockResetWorkManagerScheduler: ResetWorkManagerScheduler
+
     private lateinit var viewModel: MainViewModel
     private val testHabitList = mutableListOf(
-        Habit(0, "Habit 1", 0, null), Habit(0, "Habit 2", 1, null)
+        Habit(0, "Habit 1", 0, null, 1),
+        Habit(0, "Habit 2", 1, null, 1)
     )
-    private val testHabit = Habit(0, "testHabit", 0, null)
+    private val testHabit = Habit(0, "testHabit", 0, null, 1)
+    private val goal = 3
     private val mockTimeLogList = listOf(mockk<TimeLogModel>())
     private val currentTime: LocalDateTime = LocalDateTime.now()
     private val timeLogModel = TimeLogModel(
@@ -49,7 +53,7 @@ class MainViewModelTest {
         day = currentTime.dayOfMonth,
         hour = currentTime.hour,
         min = currentTime.minute,
-        seconds = currentTime.second,
+        seconds = null,
         habitName = testHabit.name
     )
 
@@ -58,6 +62,11 @@ class MainViewModelTest {
     fun setUp() = runTest {
         Dispatchers.setMain(testDispatcher)
         mockRepository = mockk()
+        mockResetWorkManagerScheduler = mockk()
+        mockApplication = mockk {
+            every { applicationContext } returns mockk()
+        }
+
         coEvery { mockRepository.getHabits() } returns flowOf(testHabitList)
         coEvery { mockRepository.updateHabit(any()) } returns Unit
         coEvery { mockRepository.addTimeLog(any()) } returns Unit
@@ -65,7 +74,12 @@ class MainViewModelTest {
         coEvery { mockRepository.addHabit(any()) } returns Unit
         coEvery { mockRepository.removeLastTimeLog(any()) } returns Unit
         coEvery { mockRepository.deleteHabit(any()) } returns Unit
-        launch { viewModel = MainViewModel(mockRepository, applicationMock) }
+        every { mockResetWorkManagerScheduler.scheduleLogAndReset(any(), any()) } returns Unit
+        every { mockResetWorkManagerScheduler.cancel(any()) } returns Unit
+        launch {
+            viewModel =
+                MainViewModel(mockRepository, mockResetWorkManagerScheduler, mockApplication)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -76,33 +90,35 @@ class MainViewModelTest {
     }
 
     @Test
-    fun testAddHabitToDB() {
-        viewModel.createHabitClicked(testHabit.name, 3)
+    fun testCreateHabitClicked_createHabitAndAddToDatabase() {
+        viewModel.createHabitClicked(testHabit.name, goal, 1)
         coVerify {
             mockRepository.addHabit(match {
-                it.name == testHabit.name && it.count == 0
+                it.name == testHabit.name && it.count == 0 && it.goal == goal
             })
         }
     }
 
     @Test
-    fun testGetHabits() {
-        runBlocking { assertEquals(testHabitList, viewModel.habitList) }
+    fun testGetHabits_fromRepository() {
+        val result = viewModel.habitList
+        runBlocking { assertEquals(testHabitList, result) }
     }
 
     @Test
-    fun testAddCount() {
+    fun testOnCountButtonClicked_addCountToHabitAndUpdateDatabase() {
+        val initialCount = testHabit.count
         viewModel.onCountButtonClicked(testHabit)
-        assertEquals(1, testHabit.count)
+        assertEquals(initialCount + 1, testHabit.count)
         coVerify {
             mockRepository.updateHabit(match {
-                it.name == testHabit.name && it.count == 1
+                it.name == testHabit.name && it.count == initialCount + 1
             })
         }
     }
 
     @Test
-    fun testDecreaseCount_WhenCountIsZero() {
+    fun testOnDecreaseButtonClicked_WhenCountIsZero_DoesNotDecreaseOrUpdateDatabase() {
         viewModel.timeLogList = emptyList()
         viewModel.onDecreaseButtonClicked(testHabit)
         assertEquals(0, testHabit.count)
@@ -112,7 +128,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun testDecreaseCount_WhenCountIsGreaterThanZero() {
+    fun testOnDecreaseButtonClicked_WhenCountIsGreaterThanZero_DecreasesAndUpdatesDatabase() {
         testHabit.count = 1
         viewModel.timeLogList = mockTimeLogList
         viewModel.onDecreaseButtonClicked(testHabit)
@@ -120,6 +136,55 @@ class MainViewModelTest {
         coVerify {
             mockRepository.updateHabit(match {
                 it.name == testHabit.name && it.count == 0
+            })
+        }
+    }
+
+    @Test
+    fun testOnHabitConfirmDeleteClick_habitRemovedFromDatabase() {
+        viewModel.onHabitConfirmDeleteClick(testHabit)
+        coVerify {
+            mockRepository.deleteHabit(match {
+                it.name == testHabit.name && it.count == testHabit.count
+            })
+        }
+    }
+
+    @Test
+    fun testUpdateHabitClicked_withNoName_ReturnsFalse() {
+        val emptyName = ""
+        val newGoal = 5
+        val resultEmpty = viewModel.updateHabitClicked(testHabit, emptyName, newGoal)
+        assertFalse(resultEmpty)
+        coVerify(exactly = 0) {
+            mockRepository.updateHabit(any())
+        }
+    }
+
+    @Test
+    fun testUpdateHabitClicked_withSameName_UpdatesGoalOnly() {
+        val sameName = testHabit.name
+        val newGoal = 5
+        val resultSame = viewModel.updateHabitClicked(testHabit, sameName, newGoal)
+        assertTrue(resultSame)
+        coVerify {
+            mockRepository.updateHabit(
+                match {
+                    it.name == sameName && it.count == testHabit.count && it.goal == newGoal
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testUpdateHabitClicked_withNewName_UpdatesNameAndGoal() {
+        val newName = "new name"
+        val newGoal = 5
+        val resultNew = viewModel.updateHabitClicked(testHabit, newName, newGoal)
+        assertTrue(resultNew)
+        coVerify {
+            mockRepository.updateHabit(match {
+                it.name == newName && it.count == testHabit.count && it.goal == newGoal
             })
         }
     }
@@ -133,7 +198,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun testLogTimeStampInDatabase() {
+    fun testLogTimeStampInDatabase_WhenAddingToCount() {
         viewModel.onCountButtonClicked(testHabit)
         coVerify {
             mockRepository.addTimeLog(match {
@@ -142,46 +207,8 @@ class MainViewModelTest {
                 it.day == timeLogModel.day &&
                 it.hour == timeLogModel.hour &&
                 it.min == timeLogModel.min &&
-                it.seconds == timeLogModel.seconds &&
                 it.habitName == timeLogModel.habitName
             })
         }
     }
-
-    @Test
-    fun testOnHabitConfirmDeleteClick(){
-        viewModel.onHabitConfirmDeleteClick(testHabit)
-        coVerify {
-            mockRepository.deleteHabit(match {
-                it.name == testHabit.name && it.count == testHabit.count
-            })
-        }
-    }
-
-    @Test
-    fun testUpdateHabitClicked(){
-        val newName = "new name"
-        val emptyName = ""
-        val sameName = testHabit.name
-        val goal = 3
-        val newGoal = 5
-        // test empty name, same name and new name
-        val resultEmpty = viewModel.updateHabitClicked(testHabit, emptyName, newGoal)
-        assertFalse(resultEmpty)
-        val resultSame = viewModel.updateHabitClicked(testHabit, sameName, goal)
-        assertTrue(resultSame)
-        coVerify {
-            mockRepository.updateHabit(match {
-                it.name == sameName && it.count == testHabit.count && it.goal == goal
-            })
-        }
-        val resultNew = viewModel.updateHabitClicked(testHabit, newName, newGoal)
-        assertTrue(resultNew)
-        coVerify {
-            mockRepository.updateHabit(match {
-                it.name == newName && it.count == testHabit.count && it.goal == newGoal
-            })
-        }
-    }
-
 }
