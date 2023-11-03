@@ -1,6 +1,5 @@
 package com.pleavinseven
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,10 +13,9 @@ import com.pleavinseven.ui.HabitTrackerApp
 import com.pleavinseven.ui.theme.HabitTrackerTheme
 import com.pleavinseven.viewmodels.MainViewModel
 import com.pleavinseven.viewmodels.MainViewModelFactory
+import com.pleavinseven.workers.ResetWorkManagerScheduler
 
 class MainActivity : ComponentActivity() {
-
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -26,16 +24,16 @@ class MainActivity : ComponentActivity() {
         val timeLogDao = db.timeLogDao()
         val habitDao = db.habitDao()
         val repository = Repository(timeLogDao, habitDao)
-
+        val resetWorkManagerScheduler = ResetWorkManagerScheduler(application)
         val viewModel: MainViewModel by viewModels {
 
             MainViewModelFactory(
-                application, repository
+                application, repository, resetWorkManagerScheduler
             )
         }
         setContent {
             HabitTrackerTheme {
-                Surface{
+                Surface {
                     HabitTrackerApp(viewModel)
                 }
             }

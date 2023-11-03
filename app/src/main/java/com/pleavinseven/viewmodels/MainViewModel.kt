@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 
 class MainViewModel(
     private val repository: Repository,
+    private val resetWorkManagerScheduler: ResetWorkManagerScheduler,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -24,7 +25,6 @@ class MainViewModel(
     var timeLogList by mutableStateOf(emptyList<TimeLogModel>())
     var habitList by mutableStateOf(emptyList<Habit>())
     val habitState: StateFlow<Habit> = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
-    private val resetWorkManagerScheduler: ResetWorkManagerScheduler = ResetWorkManagerScheduler(application)
 
     init {
         getHabits()
