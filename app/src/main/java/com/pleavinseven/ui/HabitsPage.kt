@@ -1,5 +1,6 @@
 package com.pleavinseven.ui
 
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -122,7 +123,7 @@ fun HabitLazyGrid(
                     mutableStateOf((false))
                 }
                 if (showDeleteDialog) {
-                    DeleteHabitDialog(viewModel, currentHabit) { showDeleteDialog = false }
+                    DeleteHabitDialog(viewModel, currentHabit, context) { showDeleteDialog = false }
                 }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
