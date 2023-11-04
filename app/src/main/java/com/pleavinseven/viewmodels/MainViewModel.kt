@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
@@ -24,7 +25,10 @@ class MainViewModel(
     var formattedTimeLogList by mutableStateOf(emptyList<String>())
     var timeLogList by mutableStateOf(emptyList<TimeLogModel>())
     var habitList by mutableStateOf(emptyList<Habit>())
-    val habitState: StateFlow<Habit> = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
+    private val _mutableHabitState = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
+    val habitState: StateFlow<Habit> = _mutableHabitState
+    private val _mutableGoalColorState = MutableStateFlow(Color.Gray)
+    val goalColorState: StateFlow<Color> = _mutableGoalColorState
 
     init {
         getHabits()
@@ -32,6 +36,14 @@ class MainViewModel(
 
     fun setCurrentHabit(habit: Habit) {
         (habitState as MutableStateFlow).value = habit
+    }
+
+    fun setGoalColor(habit: Habit, grey: Color, green: Color) {
+        val goal = habit.goal
+        val count = habit.count
+        if (goal != null) {
+            _mutableGoalColorState.value = if (goal > count) grey else green
+        }
     }
 
     fun onCountButtonClicked(habit: Habit) {
@@ -57,14 +69,13 @@ class MainViewModel(
         return false
     }
 
-    fun updateHabitClicked(
+    fun updateHabitClicked(habit: Habit, habitName: String, habitGoal: Int?): Boolean {
         // if new name is allowed update and return true else return false
-        habit: Habit, habitName: String, habitGoal: Int?): Boolean {
         if (!isHabitDuplicateOrEmpty(habitName, habit)) {
             resetWorkManagerScheduler.cancel(habit.name)
-            habit.name = habitName
-            habit.goal = habitGoal
-            updateHabitInDB(habit)
+            val updatedHabit = habit.copy(name = habitName, goal = habitGoal)
+            updateHabitInDB(updatedHabit)
+            _mutableHabitState.value = updatedHabit
             resetWorkManagerScheduler.scheduleLogAndReset(habitName, 1)
             return true
         }

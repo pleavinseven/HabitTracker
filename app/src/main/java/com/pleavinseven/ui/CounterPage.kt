@@ -74,25 +74,19 @@ import kotlinx.coroutines.launch
 fun CounterPage(viewModel: MainViewModel) {
     val habit by viewModel.habitState.collectAsState()
     val habitName = habit.name
-    val startCount = habit.count
     val goal = habit.goal
+    val grey = MaterialTheme.colorScheme.onBackground
+    val green = Color(0xFF388E3C)
+    viewModel.setGoalColor(habit, grey, green)
+    val goalColor by viewModel.goalColorState.collectAsState()
     var count by remember {
-        mutableIntStateOf(startCount)
+        mutableIntStateOf(habit.count)
     }
     var showPopupWindow by remember {
         mutableStateOf((false))
     }
-    val showGoal = goal != null
-    val grey = MaterialTheme.colorScheme.onBackground
-    val green = Color(0xFF388E3C)
-    val startGoalColor =
-        if(showGoal) {
-            if (count < goal!!) grey else green
-        } else {
-            Color.Transparent
-        }
-    var goalColor by remember {
-        mutableStateOf(startGoalColor)
+    val showGoal by remember {
+        mutableStateOf( goal != null)
     }
 
     val context = LocalContext.current
@@ -128,7 +122,7 @@ fun CounterPage(viewModel: MainViewModel) {
             }
         }) { innerPadding ->
         if (showPopupWindow) {
-            EditHabitDialog(viewModel, habit) { showPopupWindow = false }
+            EditHabitDialog(viewModel, context, habit) { showPopupWindow = false }
         }
         Column(
             modifier = Modifier
@@ -154,9 +148,7 @@ fun CounterPage(viewModel: MainViewModel) {
                         viewModel.onDecreaseButtonClicked(habit)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        if(showGoal) {
-                            if (goal!! > count) goalColor = grey
-                        }
+                        viewModel.setGoalColor(habit, grey, green)
                     },
                     modifier = Modifier
                         .size(60.dp)
@@ -210,9 +202,7 @@ fun CounterPage(viewModel: MainViewModel) {
                         viewModel.onCountButtonClicked(habit)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        if(showGoal) {
-                            if (goal!! <= count) goalColor = green
-                        }
+                        viewModel.setGoalColor(habit, grey, green)
                     }, modifier = Modifier
                         .weight(0.5f)
                         .size(60.dp)
@@ -225,37 +215,46 @@ fun CounterPage(viewModel: MainViewModel) {
                 }
             }
             if (showGoal) {
-                Card(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .padding(horizontal = 28.dp),
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(goalColor)
-                                .wrapContentHeight(),
-                            text = "Goal $goal",
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
-                        )
-                    }
-                }
+                GoalCard(goalColor, goal)
             }
         }
     }
 }
 
 @Composable
-fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Unit) {
+fun GoalCard(goalColor: Color, goal: Int?){
+    Card(
+        modifier = Modifier
+            .height(48.dp)
+            .padding(horizontal = 28.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(goalColor)
+                    .wrapContentHeight(),
+                text = "Goal $goal",
+                textAlign = TextAlign.Center,
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+            )
+        }
+    }
+}
+
+@Composable
+fun EditHabitDialog(
+    viewModel: MainViewModel,
+    context: Context,
+    habit: Habit,
+    onDismiss: () -> Unit
+) {
     val scope = rememberCoroutineScope()
-    val habitName = habit.name
     var editHabitName by remember {
-        mutableStateOf(habitName)
+        mutableStateOf(habit.name)
     }
     var editHabitGoal by remember {
         if (habit.goal == null) {
@@ -264,7 +263,6 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
             mutableStateOf(habit.goal.toString())
         }
     }
-    val context = LocalContext.current
     Dialog(
         onDismissRequest = onDismiss
     ) {
