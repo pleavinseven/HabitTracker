@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
+    val context = LocalContext.current
     var showPopupWindow by remember {
         mutableStateOf((false))
     }
@@ -95,16 +96,19 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
             }
         }) { innerPadding ->
         if (showPopupWindow) {
-            AddHabitPopUp(viewModel) { showPopupWindow = false }
+            AddHabitPopUp(viewModel, context) { showPopupWindow = false }
         }
-        HabitLazyGrid(viewModel = viewModel, navController = navController, innerPadding)
+        HabitLazyGrid(viewModel, navController, context, innerPadding)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HabitLazyGrid(
-    viewModel: MainViewModel, navController: NavController, paddingValues: PaddingValues
+    viewModel: MainViewModel,
+    navController: NavController,
+    context: Context,
+    paddingValues: PaddingValues
 ) {
     LazyVerticalGrid(modifier = Modifier.padding(paddingValues),
         columns = GridCells.Fixed(2),
@@ -165,7 +169,7 @@ fun HabitLazyGrid(
 
 
 @Composable
-fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
+fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     var habitName by remember {
         mutableStateOf("")
@@ -231,6 +235,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
                                     Utils.showToastShort(context, R.string.habit_already_exists)
                                 }
                             } else {
+                                Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                                 onDismiss()
                             }
                         },
@@ -249,7 +254,12 @@ fun AddHabitPopUp(viewModel: MainViewModel, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Unit) {
+fun DeleteHabitDialog(
+    viewModel: MainViewModel,
+    habit: Habit,
+    context: Context,
+    onDismiss: () -> Unit
+) {
     Dialog(
         onDismissRequest = onDismiss,
     ) {
@@ -280,6 +290,7 @@ fun DeleteHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> U
                     IconButton(
                         onClick = {
                             viewModel.onHabitConfirmDeleteClick(habit)
+                            Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                             onDismiss()
                         }, modifier = Modifier.padding(8.dp)
                     ) {

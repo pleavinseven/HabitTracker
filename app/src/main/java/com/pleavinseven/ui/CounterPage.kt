@@ -1,5 +1,6 @@
 package com.pleavinseven.ui
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -93,6 +94,8 @@ fun CounterPage(viewModel: MainViewModel) {
     var goalColor by remember {
         mutableStateOf(startGoalColor)
     }
+
+    val context = LocalContext.current
     val fontSize = if (habitName.length < 10) 36.sp else 32.sp
 
     viewModel.getTimeLogs(habitName)
@@ -149,6 +152,7 @@ fun CounterPage(viewModel: MainViewModel) {
                 IconButton(
                     onClick = {
                         viewModel.onDecreaseButtonClicked(habit)
+                        Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
                         if(showGoal) {
                             if (goal!! > count) goalColor = grey
@@ -204,6 +208,7 @@ fun CounterPage(viewModel: MainViewModel) {
                 IconButton(
                     onClick = {
                         viewModel.onCountButtonClicked(habit)
+                        Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
                         if(showGoal) {
                             if (goal!! <= count) goalColor = green
@@ -310,6 +315,7 @@ fun EditHabitDialog(viewModel: MainViewModel, habit: Habit, onDismiss: () -> Uni
                                     Utils.showToastShort(context, R.string.habit_already_exists)
                                 }
                             } else {
+                                Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                                 onDismiss()
                             }
                         },
