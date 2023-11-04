@@ -180,7 +180,6 @@ fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> U
     val habitRepeat by remember {
         mutableLongStateOf(1)
     }
-    val context = LocalContext.current
     Dialog(
         onDismissRequest = onDismiss
     ) {
