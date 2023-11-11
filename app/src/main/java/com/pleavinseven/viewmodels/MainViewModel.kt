@@ -13,6 +13,7 @@ import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.workers.ResetWorkManagerScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -63,7 +64,6 @@ class MainViewModel(
     fun createHabitClicked(habitName: String, habitGoal: Int?, habitRepeat: Long): Boolean {
         if (!isHabitDuplicateOrEmpty(habitName)) {
             addHabitToDB(habitName, habitGoal, habitRepeat)
-            resetWorkManagerScheduler.scheduleLogAndReset(habitName, habitRepeat)
             return true
         }
         return false
@@ -71,12 +71,13 @@ class MainViewModel(
 
     fun updateHabitClicked(habit: Habit, habitName: String, habitGoal: Int?): Boolean {
         // if new name is allowed update and return true else return false
+        val habitId = habit.id
         if (!isHabitDuplicateOrEmpty(habitName, habit)) {
-            resetWorkManagerScheduler.cancel(habit.name)
+            resetWorkManagerScheduler.cancel(habit.id)
             val updatedHabit = habit.copy(name = habitName, goal = habitGoal)
             updateHabitInDB(updatedHabit)
             _mutableHabitState.value = updatedHabit
-            resetWorkManagerScheduler.scheduleLogAndReset(habitName, 1)
+            resetWorkManagerScheduler.scheduleLogAndReset(habitId, 1)
             return true
         }
         return false
@@ -86,7 +87,6 @@ class MainViewModel(
         viewModelScope.launch {
             repository.deleteHabit(habit)
         }
-        resetWorkManagerScheduler.cancel(habit.name)
     }
 
     fun getTimeLogs(habitId: Int) {
@@ -157,14 +157,29 @@ class MainViewModel(
 
     private fun getHabits() {
         viewModelScope.launch {
-            repository.getHabits().collect { habitListFlow ->
+            repository.getHabits().distinctUntilChanged().collect { habitListFlow ->
+                scheduleResetWorkerForNewHabits(habitListFlow, habitList)
+                cancelResetWorkerForRemovedHabits(habitListFlow, habitList)
                 habitList = habitListFlow
             }
+        }
+    }
+
+    private fun cancelResetWorkerForRemovedHabits(habitListFlow: List<Habit>, habitList: List<Habit>) {
+        val removedHabits = habitList - habitListFlow
+        removedHabits.forEach { habit ->
+            resetWorkManagerScheduler.cancel(habit.id)
+        }
+    }
+
+    private fun scheduleResetWorkerForNewHabits(habitListFlow: List<Habit>, habitList: List<Habit>) {
+        val newHabits = habitListFlow - habitList
+        newHabits.forEach { habit ->
+            resetWorkManagerScheduler.scheduleLogAndReset(habit.id, habit.repeat)
         }
     }
 
     private fun formatReadableTime(currentTime: TimeLogModel): String {
         return "${currentTime.day}-${currentTime.month}-${currentTime.year} ${currentTime.hour}:${currentTime.min}"
     }
-
 }
