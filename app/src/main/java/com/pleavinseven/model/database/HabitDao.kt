@@ -20,8 +20,8 @@ interface HabitDao {
     fun getHabits(): Flow<List<Habit>>
 
     @Transaction
-    @Query("SELECT * FROM habit WHERE name = :habitName")
-    fun getHabitByName(habitName: String): Habit
+    @Query("SELECT * FROM habit WHERE id = :habitId")
+    fun getHabitById(habitId: Int): Habit
 
     @Update
     suspend fun updateHabit(habit: Habit)

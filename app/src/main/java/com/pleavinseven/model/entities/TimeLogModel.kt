@@ -15,5 +15,5 @@ data class TimeLogModel(
     val hour: Int,
     val min: Int,
     val seconds: Int?,
-    val habitName: String
+    val habitId: Int
 ) : Parcelable

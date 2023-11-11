@@ -138,7 +138,7 @@ fun HabitLazyGrid(
                                 navController.navigate(
                                     "CounterPage"
                                 )
-                                viewModel.getTimeLogs(currentHabit.name)
+                                viewModel.getTimeLogs(currentHabit.id)
                             }, onLongClick = {
                                 showDeleteDialog = true
                             }),

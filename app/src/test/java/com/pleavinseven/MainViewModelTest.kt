@@ -54,7 +54,7 @@ class MainViewModelTest {
         hour = currentTime.hour,
         min = currentTime.minute,
         seconds = null,
-        habitName = testHabit.name
+        habitId = testHabit.id
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -207,7 +207,7 @@ class MainViewModelTest {
                 it.day == timeLogModel.day &&
                 it.hour == timeLogModel.hour &&
                 it.min == timeLogModel.min &&
-                it.habitName == timeLogModel.habitName
+                it.habitId == timeLogModel.habitId
             })
         }
     }

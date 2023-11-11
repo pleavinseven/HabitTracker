@@ -48,7 +48,7 @@ class MainViewModel(
 
     fun onCountButtonClicked(habit: Habit) {
         addCount(habit)
-        logTimeStampInDatabase(habit.name)
+        logTimeStampInDatabase(habit.id)
     }
 
     fun onDecreaseButtonClicked(habit: Habit) {
@@ -89,9 +89,9 @@ class MainViewModel(
         resetWorkManagerScheduler.cancel(habit.name)
     }
 
-    fun getTimeLogs(habitName: String) {
+    fun getTimeLogs(habitId: Int) {
         viewModelScope.launch {
-            repository.getHabitWithTimeLogs(habitName).collect { habitWithTimeLogsList ->
+            repository.getHabitWithTimeLogs(habitId).collect { habitWithTimeLogsList ->
                 for (habitWithTimeLog in habitWithTimeLogsList) {
                     timeLogList = habitWithTimeLog.timeLogs
                     formattedTimeLogList = habitWithTimeLog.timeLogs.map { item ->
@@ -138,7 +138,7 @@ class MainViewModel(
         updateHabitInDB(habit)
     }
 
-    private fun logTimeStampInDatabase(habitName: String) {
+    private fun logTimeStampInDatabase(habitId: Int) {
         val currentTime = LocalDateTime.now()
         val timeLogModel = TimeLogModel(
             logId = 0,
@@ -148,7 +148,7 @@ class MainViewModel(
             hour = currentTime.hour,
             min = currentTime.minute,
             seconds = currentTime.second,
-            habitName = habitName
+            habitId = habitId
         )
         viewModelScope.launch {
             repository.addTimeLog(timeLogModel)

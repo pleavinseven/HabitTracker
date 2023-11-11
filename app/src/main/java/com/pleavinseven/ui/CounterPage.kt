@@ -92,7 +92,7 @@ fun CounterPage(viewModel: MainViewModel) {
     val context = LocalContext.current
     val fontSize = if (habitName.length < 10) 36.sp else 32.sp
 
-    viewModel.getTimeLogs(habitName)
+    viewModel.getTimeLogs(habit.id)
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()
