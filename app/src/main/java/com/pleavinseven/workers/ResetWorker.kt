@@ -13,8 +13,9 @@ class ResetWorker(appContext: Context, workerParameters: WorkerParameters) :
     private val timeLogDao = db.timeLogDao()
     private val habitDao = db.habitDao()
     private val repository = Repository(timeLogDao, habitDao)
-    private val habitName = inputData.getString("habitName")
-    val habit: Habit = repository.getHabitByName(habitName!!)
+    private val habitId = inputData.getString("habitId")?.toInt()
+    val habit: Habit = repository.getHabitById(habitId!!)
+
     override suspend fun doWork(): Result {
         return try {
             logDailyCount()
@@ -33,6 +34,4 @@ class ResetWorker(appContext: Context, workerParameters: WorkerParameters) :
         habit.count = 0
         repository.updateHabit(habit)
     }
-
-
 }

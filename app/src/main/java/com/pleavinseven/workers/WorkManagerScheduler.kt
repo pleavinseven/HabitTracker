@@ -1,7 +1,7 @@
 package com.pleavinseven.workers
 
 interface WorkManagerScheduler {
-    fun scheduleLogAndReset(habitName: String, frequency: Long)
+    fun scheduleLogAndReset(habitId: Int, frequency: Long)
 
-    fun cancel(habitName: String)
+    fun cancel(habitId: Int)
 }
