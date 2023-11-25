@@ -24,8 +24,8 @@ class Repository(
         return habitDao.getHabits()
     }
 
-    fun getHabitByName(habitName: String): Habit {
-        return habitDao.getHabitByName(habitName)
+    fun getHabitById(habitId: Int): Habit {
+        return habitDao.getHabitById(habitId)
     }
 
     suspend fun addTimeLog(timeLogModel: TimeLogModel) = withContext(dispatcher) {
