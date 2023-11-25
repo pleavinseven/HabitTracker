@@ -49,7 +49,7 @@ class MainViewModel(
         }
     }
 
-    fun setNavBarPosition(pos: Int){
+    fun setNavBarPosition(pos: Int) {
         _mutableNavBarPosition.value = pos
     }
 
@@ -171,14 +171,20 @@ class MainViewModel(
         }
     }
 
-    private fun cancelResetWorkerForRemovedHabits(habitListFlow: List<Habit>, habitList: List<Habit>) {
+    private fun cancelResetWorkerForRemovedHabits(
+        habitListFlow: List<Habit>,
+        habitList: List<Habit>
+    ) {
         val removedHabits = habitList - habitListFlow
         removedHabits.forEach { habit ->
             resetWorkManagerScheduler.cancel(habit.id)
         }
     }
 
-    private fun scheduleResetWorkerForNewHabits(habitListFlow: List<Habit>, habitList: List<Habit>) {
+    private fun scheduleResetWorkerForNewHabits(
+        habitListFlow: List<Habit>,
+        habitList: List<Habit>
+    ) {
         val newHabits = habitListFlow - habitList
         newHabits.forEach { habit ->
             resetWorkManagerScheduler.scheduleLogAndReset(habit.id, habit.repeat)
