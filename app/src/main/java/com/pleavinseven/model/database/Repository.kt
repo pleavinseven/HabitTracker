@@ -1,5 +1,6 @@
 package com.pleavinseven.model.database
 
+import com.pleavinseven.model.entities.DailyCount
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.model.entities.relations.HabitWithTimeLogs
@@ -11,6 +12,7 @@ import kotlinx.coroutines.withContext
 class Repository(
     private val timeLogDao: TimeLogDao,
     private val habitDao: HabitDao,
+    private val dailyCountDao: DailyCountDao,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
@@ -44,5 +46,9 @@ class Repository(
 
     suspend fun removeLastTimeLog(timeLogModel: TimeLogModel) = withContext(dispatcher) {
         timeLogDao.deleteTimeLog(timeLogModel)
+    }
+
+    suspend fun setDailyCount(dailyCount: DailyCount) = withContext(dispatcher) {
+        dailyCountDao.setDailyCount(dailyCount)
     }
 }

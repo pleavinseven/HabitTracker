@@ -2,6 +2,7 @@ package com.pleavinseven.model.entities.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.pleavinseven.model.entities.DailyCount
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 
@@ -11,5 +12,10 @@ data class HabitWithTimeLogs(
         parentColumn = "id",
         entityColumn = "habitId"
     )
-    val timeLogs: List<TimeLogModel>
+    val timeLogs: List<TimeLogModel>,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "habitId"
+    )
+    val dailyCount: List<DailyCount>
 )

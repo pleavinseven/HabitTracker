@@ -4,16 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.pleavinseven.model.entities.DailyCount
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.model.entities.Habit
 
-
-@Database(entities = [TimeLogModel::class, Habit::class], version = 5)
+@Database(entities = [TimeLogModel::class, Habit::class, DailyCount::class], version = 6)
 abstract class HabitDatabase : RoomDatabase() {
 
 
     abstract fun timeLogDao(): TimeLogDao
     abstract fun habitDao(): HabitDao
+    abstract fun dailyCountDao(): DailyCountDao
 
     companion object {
         @Volatile

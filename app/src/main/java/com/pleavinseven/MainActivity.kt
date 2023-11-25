@@ -23,7 +23,8 @@ class MainActivity : ComponentActivity() {
         val db = HabitDatabase.getDatabase(application)
         val timeLogDao = db.timeLogDao()
         val habitDao = db.habitDao()
-        val repository = Repository(timeLogDao, habitDao)
+        val dailyCountDao = db.dailyCountDao()
+        val repository = Repository(timeLogDao, habitDao, dailyCountDao)
         val resetWorkManagerScheduler = ResetWorkManagerScheduler(application)
         val viewModel: MainViewModel by viewModels {
 
