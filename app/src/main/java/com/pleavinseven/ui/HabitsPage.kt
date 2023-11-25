@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -73,15 +72,7 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
         .statusBarsPadding()
         .navigationBarsPadding(),
         topBar = {
-            TopAppBar(title = {}, navigationIcon = {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Menu,
-                        contentDescription = stringResource(id = R.string.confirm),
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            })
+            TopAppBar(title = {})
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -95,7 +86,11 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
                     modifier = Modifier.size(40.dp)
                 )
             }
-        }) { innerPadding ->
+        },
+        bottomBar = {
+            BottomNavBar(viewModel, navController)
+        }
+    ) { innerPadding ->
         if (showPopupWindow) {
             AddHabitPopUp(viewModel, context) { showPopupWindow = false }
         }

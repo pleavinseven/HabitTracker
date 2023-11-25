@@ -14,7 +14,13 @@ fun HabitTrackerApp(viewModel: MainViewModel) {
             HabitsPage(viewModel = viewModel, navController)
         }
         composable("CounterPage") {
-            CounterPage(viewModel = viewModel)
+            CounterPage(viewModel = viewModel, navController)
+        }
+        composable("LogPage") {
+            LogPage(viewModel = viewModel, navController)
+        }
+        composable("Settings") {
+            Settings(viewModel = viewModel, navController)
         }
     }
 }

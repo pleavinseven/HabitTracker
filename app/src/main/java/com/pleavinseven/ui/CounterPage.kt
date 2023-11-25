@@ -30,7 +30,6 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -63,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import com.pleavinseven.R
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CounterPage(viewModel: MainViewModel) {
+fun CounterPage(viewModel: MainViewModel, navController: NavController) {
     val habit by viewModel.habitState.collectAsState()
     val habitName = habit.name
     val goal = habit.goal
@@ -98,15 +98,7 @@ fun CounterPage(viewModel: MainViewModel) {
         .statusBarsPadding()
         .navigationBarsPadding(),
         topBar = {
-            TopAppBar(title = {}, navigationIcon = {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Menu,
-                        contentDescription = stringResource(id = R.string.confirm),
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            })
+            TopAppBar(title = {})
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -120,7 +112,11 @@ fun CounterPage(viewModel: MainViewModel) {
                     modifier = Modifier.size(40.dp)
                 )
             }
-        }) { innerPadding ->
+        },
+        bottomBar = {
+            BottomNavBar(viewModel, navController)
+        }
+    ) { innerPadding ->
         if (showPopupWindow) {
             EditHabitDialog(viewModel, context, habit) { showPopupWindow = false }
         }

@@ -30,6 +30,8 @@ class MainViewModel(
     val habitState: StateFlow<Habit> = _mutableHabitState
     private val _mutableGoalColorState = MutableStateFlow(Color.Gray)
     val goalColorState: StateFlow<Color> = _mutableGoalColorState
+    private val _mutableNavBarPosition = MutableStateFlow(0)
+    val navBarPosition: StateFlow<Int> = _mutableNavBarPosition
 
     init {
         getHabits()
@@ -45,6 +47,10 @@ class MainViewModel(
         if (goal != null) {
             _mutableGoalColorState.value = if (goal > count) grey else green
         }
+    }
+
+    fun setNavBarPosition(pos: Int){
+        _mutableNavBarPosition.value = pos
     }
 
     fun onCountButtonClicked(habit: Habit) {
