@@ -53,6 +53,7 @@ android {
 dependencies {
 
     val composeVersion = "2.6.2"
+    val workVersion = "2.8.1"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$composeVersion")
@@ -68,7 +69,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.4")
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material:material-icons-extended:1.5.3")
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
 
     val roomVersion = "2.5.2"
 
@@ -91,4 +92,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     testImplementation("io.mockk:mockk:1.13.5")
     androidTestImplementation("io.mockk:mockk-android:1.12.5")
+    testImplementation("androidx.work:work-testing:$workVersion")
+    androidTestImplementation("androidx.work:work-testing:$workVersion")
 }
