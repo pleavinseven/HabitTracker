@@ -66,19 +66,26 @@ import androidx.navigation.NavController
 import com.pleavinseven.R
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
-import com.pleavinseven.viewmodels.MainViewModel
+import com.pleavinseven.viewmodels.HabitViewModel
+import com.pleavinseven.viewmodels.NavigationViewModel
+import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CounterPage(viewModel: MainViewModel, navController: NavController) {
-    val habit by viewModel.habitState.collectAsState()
+fun CounterPage(
+    navigationViewModel: NavigationViewModel,
+    habitViewModel: HabitViewModel,
+    timeLogViewModel: TimeLogViewModel,
+    navController: NavController
+) {
+    val habit by habitViewModel.habitState.collectAsState()
     val habitName = habit.name
     val goal = habit.goal
     val grey = MaterialTheme.colorScheme.onBackground
     val green = Color(0xFF388E3C)
-    viewModel.setGoalColor(habit, grey, green)
-    val goalColor by viewModel.goalColorState.collectAsState()
+    habitViewModel.setGoalColor(habit, grey, green)
+    val goalColor by habitViewModel.goalColorState.collectAsState()
     var count by remember {
         mutableIntStateOf(habit.count)
     }
@@ -86,13 +93,13 @@ fun CounterPage(viewModel: MainViewModel, navController: NavController) {
         mutableStateOf((false))
     }
     val showGoal by remember {
-        mutableStateOf( goal != null)
+        mutableStateOf(goal != null)
     }
 
     val context = LocalContext.current
     val fontSize = if (habitName.length < 10) 36.sp else 32.sp
 
-    viewModel.getTimeLogs(habit.id)
+    timeLogViewModel.getTimeLogs(habit.id)
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()
@@ -114,11 +121,10 @@ fun CounterPage(viewModel: MainViewModel, navController: NavController) {
             }
         },
         bottomBar = {
-            BottomNavBar(viewModel, navController)
-        }
-    ) { innerPadding ->
+            BottomNavBar(navigationViewModel, navController)
+        }) { innerPadding ->
         if (showPopupWindow) {
-            EditHabitDialog(viewModel, context, habit) { showPopupWindow = false }
+            EditHabitDialog(habitViewModel, context, habit) { showPopupWindow = false }
         }
         Column(
             modifier = Modifier
@@ -141,10 +147,11 @@ fun CounterPage(viewModel: MainViewModel, navController: NavController) {
             ) {
                 IconButton(
                     onClick = {
-                        viewModel.onDecreaseButtonClicked(habit)
+                        habitViewModel.onDecreaseButtonClicked(habit)
+                        timeLogViewModel.removeLastTimeLog()
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        viewModel.setGoalColor(habit, grey, green)
+                        habitViewModel.setGoalColor(habit, grey, green)
                     },
                     modifier = Modifier
                         .size(60.dp)
@@ -195,10 +202,11 @@ fun CounterPage(viewModel: MainViewModel, navController: NavController) {
                 }
                 IconButton(
                     onClick = {
-                        viewModel.onCountButtonClicked(habit)
+                        habitViewModel.onCountButtonClicked(habit)
+                        timeLogViewModel.logTimeStampInDatabase(habit.id)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        viewModel.setGoalColor(habit, grey, green)
+                        habitViewModel.setGoalColor(habit, grey, green)
                     }, modifier = Modifier
                         .weight(0.5f)
                         .size(60.dp)
@@ -218,7 +226,7 @@ fun CounterPage(viewModel: MainViewModel, navController: NavController) {
 }
 
 @Composable
-fun GoalCard(goalColor: Color, goal: Int?){
+fun GoalCard(goalColor: Color, goal: Int?) {
     Card(
         modifier = Modifier
             .height(48.dp)
@@ -243,10 +251,7 @@ fun GoalCard(goalColor: Color, goal: Int?){
 
 @Composable
 fun EditHabitDialog(
-    viewModel: MainViewModel,
-    context: Context,
-    habit: Habit,
-    onDismiss: () -> Unit
+    habitViewModel: HabitViewModel, context: Context, habit: Habit, onDismiss: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var editHabitName by remember {
@@ -283,12 +288,10 @@ fun EditHabitDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
-                        onClick = { onDismiss() },
-                        modifier = Modifier.padding(8.dp)
+                        onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Cancel,
@@ -304,7 +307,10 @@ fun EditHabitDialog(
                                 editHabitGoal.toInt()
                             }
                             // checks if habit is updatable and either updates or returns toast
-                            if (!viewModel.updateHabitClicked(habit, editHabitName, habitGoalInt)) {
+                            if (!habitViewModel.updateHabitClicked(
+                                    habit, editHabitName, habitGoalInt
+                                )
+                            ) {
                                 scope.launch {
                                     Utils.showToastShort(context, R.string.habit_already_exists)
                                 }
@@ -312,8 +318,7 @@ fun EditHabitDialog(
                                 Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                                 onDismiss()
                             }
-                        },
-                        modifier = Modifier.padding(8.dp)
+                        }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,

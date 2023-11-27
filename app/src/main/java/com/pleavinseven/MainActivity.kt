@@ -11,8 +11,11 @@ import com.pleavinseven.model.database.HabitDatabase
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.ui.HabitTrackerApp
 import com.pleavinseven.ui.theme.HabitTrackerTheme
-import com.pleavinseven.viewmodels.MainViewModel
-import com.pleavinseven.viewmodels.MainViewModelFactory
+import com.pleavinseven.viewmodels.HabitViewModel
+import com.pleavinseven.viewmodels.HabitViewModelFactory
+import com.pleavinseven.viewmodels.NavigationViewModel
+import com.pleavinseven.viewmodels.TimeLogViewModel
+import com.pleavinseven.viewmodels.TimeLogViewModelFactory
 import com.pleavinseven.workers.ResetWorkManagerScheduler
 
 class MainActivity : ComponentActivity() {
@@ -26,16 +29,17 @@ class MainActivity : ComponentActivity() {
         val dailyCountDao = db.dailyCountDao()
         val repository = Repository(timeLogDao, habitDao, dailyCountDao)
         val resetWorkManagerScheduler = ResetWorkManagerScheduler(application)
-        val viewModel: MainViewModel by viewModels {
-
-            MainViewModelFactory(
-                application, repository, resetWorkManagerScheduler
-            )
+        val habitViewModel: HabitViewModel by viewModels {
+            HabitViewModelFactory(repository, resetWorkManagerScheduler)
+        }
+        val navigationViewModel = NavigationViewModel()
+        val timeLogViewModel: TimeLogViewModel by viewModels {
+            TimeLogViewModelFactory(repository)
         }
         setContent {
             HabitTrackerTheme {
                 Surface {
-                    HabitTrackerApp(viewModel)
+                    HabitTrackerApp(navigationViewModel, habitViewModel, timeLogViewModel)
                 }
             }
         }

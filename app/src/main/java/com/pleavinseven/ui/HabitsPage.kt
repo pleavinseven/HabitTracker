@@ -57,12 +57,19 @@ import androidx.navigation.NavController
 import com.pleavinseven.R
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
-import com.pleavinseven.viewmodels.MainViewModel
+import com.pleavinseven.viewmodels.HabitViewModel
+import com.pleavinseven.viewmodels.NavigationViewModel
+import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
+fun HabitsPage(
+    navigationViewModel: NavigationViewModel,
+    habitViewModel: HabitViewModel,
+    timeLogViewModel: TimeLogViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
     var showPopupWindow by remember {
         mutableStateOf((false))
@@ -88,20 +95,20 @@ fun HabitsPage(viewModel: MainViewModel, navController: NavController) {
             }
         },
         bottomBar = {
-            BottomNavBar(viewModel, navController)
-        }
-    ) { innerPadding ->
+            BottomNavBar(navigationViewModel, navController)
+        }) { innerPadding ->
         if (showPopupWindow) {
-            AddHabitPopUp(viewModel, context) { showPopupWindow = false }
+            AddHabitPopUp(habitViewModel, context) { showPopupWindow = false }
         }
-        HabitLazyGrid(viewModel, navController, context, innerPadding)
+        HabitLazyGrid(habitViewModel, timeLogViewModel, navController, context, innerPadding)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HabitLazyGrid(
-    viewModel: MainViewModel,
+    habitViewModel: HabitViewModel,
+    timeLogViewModel: TimeLogViewModel,
     navController: NavController,
     context: Context,
     paddingValues: PaddingValues
@@ -109,8 +116,8 @@ fun HabitLazyGrid(
     LazyVerticalGrid(modifier = Modifier.padding(paddingValues),
         columns = GridCells.Fixed(2),
         content = {
-            items(viewModel.habitList.size) { item ->
-                val currentHabit = viewModel.habitList[item]
+            items(habitViewModel.habitList.size) { item ->
+                val currentHabit = habitViewModel.habitList[item]
                 val currentName = currentHabit.name
                 val topPadding = if (currentName.length < 10) 0.dp else 4.dp
                 val fontSize = if (currentName.length < 10) 36.sp else 32.sp
@@ -118,7 +125,9 @@ fun HabitLazyGrid(
                     mutableStateOf((false))
                 }
                 if (showDeleteDialog) {
-                    DeleteHabitDialog(viewModel, currentHabit, context) { showDeleteDialog = false }
+                    DeleteHabitDialog(habitViewModel, currentHabit, context) {
+                        showDeleteDialog = false
+                    }
                 }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -129,11 +138,11 @@ fun HabitLazyGrid(
                             .padding(8.dp, 12.dp, 8.dp, 0.dp)
                             .aspectRatio(1f)
                             .combinedClickable(onClick = {
-                                viewModel.setCurrentHabit(currentHabit)
+                                habitViewModel.setCurrentHabit(currentHabit)
                                 navController.navigate(
                                     "CounterPage"
                                 )
-                                viewModel.getTimeLogs(currentHabit.id)
+                                timeLogViewModel.getTimeLogs(currentHabit.id)
                             }, onLongClick = {
                                 showDeleteDialog = true
                             }),
@@ -159,13 +168,12 @@ fun HabitLazyGrid(
                     )
                 }
             }
-        }
-    )
+        })
 }
 
 
 @Composable
-fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> Unit) {
+fun AddHabitPopUp(habitViewModel: HabitViewModel, context: Context, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     var habitName by remember {
         mutableStateOf("")
@@ -200,12 +208,10 @@ fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
-                        onClick = { onDismiss() },
-                        modifier = Modifier.padding(8.dp)
+                        onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Cancel,
@@ -220,10 +226,8 @@ fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                             } else {
                                 habitGoal.toInt()
                             }
-                            if (!viewModel.createHabitClicked(
-                                    habitName,
-                                    habitGoalInt,
-                                    habitRepeat
+                            if (!habitViewModel.createHabitClicked(
+                                    habitName, habitGoalInt, habitRepeat
                                 )
                             ) {
                                 scope.launch {
@@ -233,8 +237,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                                 Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                                 onDismiss()
                             }
-                        },
-                        modifier = Modifier.padding(8.dp)
+                        }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
@@ -250,10 +253,7 @@ fun AddHabitPopUp(viewModel: MainViewModel, context: Context, onDismiss: () -> U
 
 @Composable
 fun DeleteHabitDialog(
-    viewModel: MainViewModel,
-    habit: Habit,
-    context: Context,
-    onDismiss: () -> Unit
+    habitViewModel: HabitViewModel, habit: Habit, context: Context, onDismiss: () -> Unit
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -269,12 +269,10 @@ fun DeleteHabitDialog(
                     fontSize = 30.sp,
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
-                        onClick = { onDismiss() },
-                        modifier = Modifier.padding(8.dp)
+                        onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Cancel,
@@ -284,7 +282,7 @@ fun DeleteHabitDialog(
                     }
                     IconButton(
                         onClick = {
-                            viewModel.onHabitConfirmDeleteClick(habit)
+                            habitViewModel.onHabitConfirmDeleteClick(habit)
                             Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                             onDismiss()
                         }, modifier = Modifier.padding(8.dp)

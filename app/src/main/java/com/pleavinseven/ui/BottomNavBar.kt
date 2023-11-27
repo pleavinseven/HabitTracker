@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.pleavinseven.viewmodels.MainViewModel
+import com.pleavinseven.viewmodels.NavigationViewModel
 
 data class BottomNavigationItem(
     val title: String,
@@ -26,7 +26,7 @@ data class BottomNavigationItem(
 )
 
 @Composable
-fun BottomNavBar(viewModel: MainViewModel, navController: NavController){
+fun BottomNavBar(navigationViewModel: NavigationViewModel, navController: NavController) {
     val navItems = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -47,33 +47,28 @@ fun BottomNavBar(viewModel: MainViewModel, navController: NavController){
             nav = "Settings"
         ),
 
-    )
-    val selectedItemIndex by viewModel.navBarPosition.collectAsState()
+        )
+    val selectedItemIndex by navigationViewModel.navBarPosition.collectAsState()
     NavigationBar {
-        navItems.forEachIndexed{ index, item ->
-            NavigationBarItem(
-                selected = selectedItemIndex == index,
-                onClick = {
-                    viewModel.setNavBarPosition(index)
-                    navController.navigate(item.nav) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+        navItems.forEachIndexed { index, item ->
+            NavigationBarItem(selected = selectedItemIndex == index, onClick = {
+                navigationViewModel.setNavBarPosition(index)
+                navController.navigate(item.nav) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
                     }
-                },
-                icon = {
-                    Icon(
-                        imageVector = if(selectedItemIndex == index){
-                            item.selectedIcon
-                        } else {
-                            item.unselectedIcon
-                        },
-                        contentDescription = item.title
-                    )
-                })
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }, icon = {
+                Icon(
+                    imageVector = if (selectedItemIndex == index) {
+                        item.selectedIcon
+                    } else {
+                        item.unselectedIcon
+                    }, contentDescription = item.title
+                )
+            })
         }
-
     }
 }
