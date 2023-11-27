@@ -58,7 +58,6 @@ fun BottomNavBar(navigationViewModel: NavigationViewModel, navController: NavCon
                         saveState = true
                     }
                     launchSingleTop = true
-                    restoreState = true
                 }
             }, icon = {
                 Icon(
