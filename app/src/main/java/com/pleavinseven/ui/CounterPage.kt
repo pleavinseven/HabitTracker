@@ -148,7 +148,7 @@ fun CounterPage(
                 IconButton(
                     onClick = {
                         habitViewModel.onDecreaseButtonClicked(habit)
-                        timeLogViewModel.removeLastTimeLog()
+                        timeLogViewModel.removeLastTimeLog(habit)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
                         habitViewModel.setGoalColor(habit, grey, green)

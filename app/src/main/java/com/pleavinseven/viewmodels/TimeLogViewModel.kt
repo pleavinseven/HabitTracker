@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pleavinseven.model.database.Repository
+import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.model.entities.TimeLogModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -27,9 +28,11 @@ class TimeLogViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun removeLastTimeLog() {
-        viewModelScope.launch {
-            repository.removeLastTimeLog(timeLogList.last())
+    fun removeLastTimeLog(habit: Habit) {
+        if(habit.count > 0) {
+            viewModelScope.launch {
+                repository.removeLastTimeLog(timeLogList.last())
+            }
         }
     }
 
