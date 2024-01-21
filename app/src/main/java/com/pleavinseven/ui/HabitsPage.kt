@@ -58,14 +58,12 @@ import com.pleavinseven.R
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.HabitViewModel
-import com.pleavinseven.viewmodels.NavigationViewModel
 import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsPage(
-    navigationViewModel: NavigationViewModel,
     habitViewModel: HabitViewModel,
     timeLogViewModel: TimeLogViewModel,
     navController: NavController
@@ -95,8 +93,9 @@ fun HabitsPage(
             }
         },
         bottomBar = {
-            BottomNavBar(navigationViewModel, navController)
-        }) { innerPadding ->
+            BottomNavBar(navController)
+        }
+    ) { innerPadding ->
         if (showPopupWindow) {
             AddHabitPopUp(habitViewModel, context) { showPopupWindow = false }
         }

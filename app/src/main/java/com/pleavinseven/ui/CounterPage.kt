@@ -67,14 +67,12 @@ import com.pleavinseven.R
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.HabitViewModel
-import com.pleavinseven.viewmodels.NavigationViewModel
 import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CounterPage(
-    navigationViewModel: NavigationViewModel,
     habitViewModel: HabitViewModel,
     timeLogViewModel: TimeLogViewModel,
     navController: NavController
@@ -121,8 +119,9 @@ fun CounterPage(
             }
         },
         bottomBar = {
-            BottomNavBar(navigationViewModel, navController)
-        }) { innerPadding ->
+            BottomNavBar(navController)
+        }
+    ) { innerPadding ->
         if (showPopupWindow) {
             EditHabitDialog(habitViewModel, context, habit) { showPopupWindow = false }
         }
@@ -251,7 +250,10 @@ fun GoalCard(goalColor: Color, goal: Int?) {
 
 @Composable
 fun EditHabitDialog(
-    habitViewModel: HabitViewModel, context: Context, habit: Habit, onDismiss: () -> Unit
+    habitViewModel: HabitViewModel,
+    context: Context,
+    habit: Habit,
+    onDismiss: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var editHabitName by remember {

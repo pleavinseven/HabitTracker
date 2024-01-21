@@ -11,63 +11,70 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.pleavinseven.viewmodels.NavigationViewModel
-
-data class BottomNavigationItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val nav: String
-)
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomNavBar(navigationViewModel: NavigationViewModel, navController: NavController) {
-    val navItems = listOf(
-        BottomNavigationItem(
-            title = "Home",
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home,
-            nav = "HabitsPage"
-        ),
-        BottomNavigationItem(
-            title = "Log",
-            selectedIcon = Icons.Filled.InsertChart,
-            unselectedIcon = Icons.Outlined.InsertChart,
-            nav = "LogPage"
-        ),
-        BottomNavigationItem(
-            title = "Settings",
-            selectedIcon = Icons.Filled.Settings,
-            unselectedIcon = Icons.Outlined.Settings,
-            nav = "Settings"
-        ),
+fun BottomNavBar(navController: NavController) {
+    val items = listOf(
+        Screen.Home,
+        Screen.Log,
+        Screen.Settings,
+    )
 
-        )
-    val selectedItemIndex by navigationViewModel.navBarPosition.collectAsState()
     NavigationBar {
-        navItems.forEachIndexed { index, item ->
-            NavigationBarItem(selected = selectedItemIndex == index, onClick = {
-                navigationViewModel.setNavBarPosition(index)
-                navController.navigate(item.nav) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        items.forEach { screen ->
+            NavigationBarItem(
+                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
+                },
+                icon = {
+                    Icon(
+                        imageVector = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true) {
+                            screen.selectedIcon
+                        } else {
+                            screen.unselectedIcon
+                        }, contentDescription = screen.route
+                    )
                 }
-            }, icon = {
-                Icon(
-                    imageVector = if (selectedItemIndex == index) {
-                        item.selectedIcon
-                    } else {
-                        item.unselectedIcon
-                    }, contentDescription = item.title
-                )
-            })
+            )
         }
     }
+}
+
+sealed class Screen(
+    val route: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+) {
+    data object Home : Screen(
+        "HabitsPage",
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home
+    )
+
+    data object Log : Screen(
+        "LogPage",
+        selectedIcon = Icons.Filled.InsertChart,
+        unselectedIcon = Icons.Outlined.InsertChart
+    )
+
+    data object Settings : Screen(
+        "Settings",
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings
+    )
 }

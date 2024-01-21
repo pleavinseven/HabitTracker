@@ -9,21 +9,24 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.pleavinseven.viewmodels.NavigationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Settings(navigationViewModel: NavigationViewModel, navController: NavController) {
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .navigationBarsPadding(),
+fun Settings(
+    navController: NavController
+) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         topBar = {
             TopAppBar(title = {})
         },
         bottomBar = {
-            BottomNavBar(navigationViewModel, navController)
-        }) { innerPadding ->
+            BottomNavBar(navController)
+        }
+    ) { innerPadding ->
         innerPadding
     }
 }
