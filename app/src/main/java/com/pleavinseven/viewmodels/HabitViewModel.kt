@@ -3,9 +3,9 @@ package com.pleavinseven.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pleavinseven.R
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.workers.ResetWorkManagerScheduler
@@ -19,25 +19,58 @@ class HabitViewModel(
     private val resetWorkManagerScheduler: ResetWorkManagerScheduler,
 ) : ViewModel() {
 
-    var habitList by mutableStateOf(emptyList<Habit>())
-    private val _mutableHabitState = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
-    val habitState: StateFlow<Habit> = _mutableHabitState
-    private val _mutableGoalColorState = MutableStateFlow(Color.Gray)
-    val goalColorState: StateFlow<Color> = _mutableGoalColorState
+    var habitList: List<Habit> by mutableStateOf(emptyList())
+
+    private val _habitState = MutableStateFlow(Habit(0, "No Habit Selected", 0, null, 1))
+    val habitState: StateFlow<Habit> get() = _habitState
+    private val _goalColorState = MutableStateFlow(R.color.purple_200)
+    val goalColorState: StateFlow<Int> get() = _goalColorState
+
+    private val _showDeleteIcon = MutableStateFlow(false)
+    val showDeleteIcon: StateFlow<Boolean> get() = _showDeleteIcon
+
+    var deleteHabitList: MutableList<Habit> = mutableListOf()
+    private val _deleteHabitList = mutableListOf<Habit>()
+
+    // show that items are in delete list
+    var _habitDeleteState by mutableStateOf(false)
+    private val habitDeleteState: Boolean = _habitDeleteState
 
     init {
         getHabits()
     }
 
     fun setCurrentHabit(habit: Habit) {
-        (habitState as MutableStateFlow).value = habit
+        _habitState.value = habit
     }
 
-    fun setGoalColor(habit: Habit, grey: Color, green: Color) {
+    fun setHabitDeleteList(habit: Habit) {
+        if (deleteHabitList.isEmpty()) {
+            setShowDelete()
+        }
+        if (deleteHabitList.contains(habit)) {
+            deleteHabitList.remove(habit)
+            setHabitDeleteList(habit)
+        } else {
+            addHabitToDeleteList(habit)
+        }
+    }
+
+    private fun addHabitToDeleteList(habit: Habit) {
+        deleteHabitList.add(habit)
+
+    }
+
+    fun setShowDelete() {
+        _showDeleteIcon.value = !_showDeleteIcon.value
+    }
+
+    fun setGoalCompletedColor(habit: Habit) {
         val goal = habit.goal
         val count = habit.count
         if (goal != null) {
-            _mutableGoalColorState.value = if (goal > count) grey else green
+            _goalColorState.value =
+                if (goal > count) R.color.purple_500 else R.color.goal_reached_color
         }
     }
 
@@ -68,7 +101,7 @@ class HabitViewModel(
             resetWorkManagerScheduler.cancel(habit.id)
             val updatedHabit = habit.copy(name = habitName, goal = habitGoal)
             updateHabitInDB(updatedHabit)
-            _mutableHabitState.value = updatedHabit
+            _habitState.value = updatedHabit
             resetWorkManagerScheduler.scheduleLogAndReset(habitId, 1)
             return true
         }
@@ -120,7 +153,7 @@ class HabitViewModel(
     private fun cancelResetWorkerForRemovedHabits(
         habitListFlow: List<Habit>, habitList: List<Habit>
     ) {
-        val removedHabits = habitList - habitListFlow
+        val removedHabits = habitList - habitListFlow.toSet()
         removedHabits.forEach { habit ->
             resetWorkManagerScheduler.cancel(habit.id)
         }
@@ -129,7 +162,7 @@ class HabitViewModel(
     private fun scheduleResetWorkerForNewHabits(
         habitListFlow: List<Habit>, habitList: List<Habit>
     ) {
-        val newHabits = habitListFlow - habitList
+        val newHabits = habitListFlow - habitList.toSet()
         newHabits.forEach { habit ->
             resetWorkManagerScheduler.scheduleLogAndReset(habit.id, habit.repeat)
         }
