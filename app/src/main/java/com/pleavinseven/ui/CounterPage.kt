@@ -35,7 +35,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -78,11 +78,7 @@ fun CounterPage(
     navController: NavController
 ) {
     val habit by habitViewModel.habitState.collectAsState()
-    val habitName = habit.name
-    val goal = habit.goal
-    val grey = MaterialTheme.colorScheme.onBackground
-    val green = Color(0xFF388E3C)
-    habitViewModel.setGoalColor(habit, grey, green)
+    habitViewModel.setGoalCompletedColor(habit)
     val goalColor by habitViewModel.goalColorState.collectAsState()
     var count by remember {
         mutableIntStateOf(habit.count)
@@ -150,7 +146,7 @@ fun CounterPage(
                         timeLogViewModel.removeLastTimeLog(habit)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        habitViewModel.setGoalColor(habit, grey, green)
+                        habitViewModel.setGoalCompletedColor(habit)
                     },
                     modifier = Modifier
                         .size(60.dp)
@@ -205,7 +201,7 @@ fun CounterPage(
                         timeLogViewModel.logTimeStampInDatabase(habit.id)
                         Utils.vibrate(context, Utils.VIBE_EFFECT_CLICK)
                         count = habit.count
-                        habitViewModel.setGoalColor(habit, grey, green)
+                        habitViewModel.setGoalCompletedColor(habit)
                     }, modifier = Modifier
                         .weight(0.5f)
                         .size(60.dp)
@@ -225,7 +221,7 @@ fun CounterPage(
 }
 
 @Composable
-fun GoalCard(goalColor: Color, goal: Int?) {
+fun GoalCard(goalColor: Int, goal: Int?) {
     Card(
         modifier = Modifier
             .height(48.dp)
@@ -238,9 +234,10 @@ fun GoalCard(goalColor: Color, goal: Int?) {
             Text(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(goalColor)
+                    .background(colorResource(id = goalColor))
                     .wrapContentHeight(),
                 text = "Goal $goal",
+                color = Color.Black,
                 textAlign = TextAlign.Center,
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
             )
