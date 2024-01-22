@@ -5,7 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -110,80 +110,88 @@ fun HabitsPage(
         if (showPopupWindow) {
             AddHabitPopUp(habitViewModel, context) { showPopupWindow = false }
         }
-        HabitLazyGrid(habitViewModel, timeLogViewModel, navController, context, innerPadding)
-    }
-}
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun HabitLazyGrid(
-    habitViewModel: HabitViewModel,
-    timeLogViewModel: TimeLogViewModel,
-    navController: NavController,
-    context: Context,
-    paddingValues: PaddingValues
-) {
-    LazyVerticalGrid(modifier = Modifier.padding(paddingValues),
-        columns = GridCells.Fixed(2),
-        content = {
-            items(habitViewModel.habitList.size) { item ->
-                val currentHabit = habitViewModel.habitList[item]
-                val currentName = currentHabit.name
-                val topPadding = if (currentName.length < 10) 0.dp else 4.dp
-                val fontSize = if (currentName.length < 10) 36.sp else 32.sp
-                var showDeleteDialog by remember {
-                    mutableStateOf((false))
-                }
-                if (showDeleteDialog) {
-                    DeleteHabitDialog(habitViewModel, currentHabit, context) {
-                        showDeleteDialog = false
-                    }
-                }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp, 12.dp, 8.dp, 0.dp)
-                            .aspectRatio(1f)
-                            .combinedClickable(onClick = {
+        LazyVerticalGrid(
+            modifier = Modifier.padding(innerPadding),
+            columns = GridCells.Fixed(2),
+            content = {
+                items(habitViewModel.habitList.size) { item ->
+                    val currentHabit = habitViewModel.habitList[item]
+                    val topPadding = if (currentHabit.name.length < 10) 0.dp else 4.dp
+                    val fontSize = if (currentHabit.name.length < 10) 36.sp else 32.sp
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        HabitCard(
+                            onClick = {
                                 habitViewModel.setCurrentHabit(currentHabit)
                                 navController.navigate(
                                     "CounterPage"
                                 )
                                 timeLogViewModel.getTimeLogs(currentHabit.id)
-                            }, onLongClick = {
-                                showDeleteDialog = true
-                            }),
-                        shape = CircleShape,
-                    ) {
-                        Column(
-                            Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = currentHabit.count.toString(),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.displayLarge,
-                            )
-                        }
+                            },
+                            onLongClick = {
+                                habitViewModel.setHabitDeleteList(currentHabit)
+                                Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
+                            },
+                            currentHabit = currentHabit,
+                        )
+                        Text(
+                            modifier = Modifier.padding(0.dp, topPadding, 0.dp, 4.dp),
+                            text = currentHabit.name,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontSize = fontSize)
+                        )
                     }
-                    Text(
-                        modifier = Modifier.padding(0.dp, topPadding, 0.dp, 4.dp),
-                        text = currentHabit.name,
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(fontSize = fontSize)
-                    )
                 }
             }
-        })
+        )
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun HabitCard(
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    currentHabit: Habit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp, 12.dp, 8.dp, 0.dp)
+            .aspectRatio(1f)
+            .combinedClickable(
+                onClick = {
+                    onClick()
+                }, onLongClick = {
+                    onLongClick()
+                }
+            ),
+        shape = CircleShape,
+    ) {
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = currentHabit.count.toString(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.displayLarge,
+            )
+        }
+    }
 }
 
 
 @Composable
-fun AddHabitPopUp(habitViewModel: HabitViewModel, context: Context, onDismiss: () -> Unit) {
+fun AddHabitPopUp(
+    habitViewModel: HabitViewModel,
+    context: Context,
+    onDismiss: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     var habitName by remember {
         mutableStateOf("")
@@ -247,7 +255,8 @@ fun AddHabitPopUp(habitViewModel: HabitViewModel, context: Context, onDismiss: (
                                 Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                                 onDismiss()
                             }
-                        }, modifier = Modifier.padding(8.dp)
+                        },
+                        modifier = Modifier.padding(8.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
