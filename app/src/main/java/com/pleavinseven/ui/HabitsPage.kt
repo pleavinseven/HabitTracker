@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,15 +71,24 @@ fun HabitsPage(
     navController: NavController
 ) {
     val context = LocalContext.current
-    var showPopupWindow by remember {
-        mutableStateOf((false))
-    }
+    val showDelete by habitViewModel.showDeleteIcon.collectAsState()
+    var showPopupWindow by remember { mutableStateOf(false) }
+    val deleteHabitList = habitViewModel.deleteHabitList
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()
         .navigationBarsPadding(),
         topBar = {
-            TopAppBar(title = {})
+            TopAppBar(
+                title = {},
+                actions = {
+                    if (showDelete) {
+                        DeleteIconDialog(habitViewModel, deleteHabitList, context) {
+                            habitViewModel.setShowDelete()
+                        }
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -251,49 +262,24 @@ fun AddHabitPopUp(habitViewModel: HabitViewModel, context: Context, onDismiss: (
 }
 
 @Composable
-fun DeleteHabitDialog(
-    habitViewModel: HabitViewModel, habit: Habit, context: Context, onDismiss: () -> Unit
+fun DeleteIconDialog(
+    habitViewModel: HabitViewModel,
+    deleteHabitList: List<Habit>,
+    context: Context,
+    onDismiss: () -> Unit
 ) {
-    Dialog(
-        onDismissRequest = onDismiss,
-    ) {
-        Card(
-            modifier = Modifier.clip(RoundedCornerShape(24.dp)),
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(id = R.string.delete_habit),
-                    modifier = Modifier.padding(8.dp),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
-                ) {
-                    IconButton(
-                        onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Cancel,
-                            contentDescription = stringResource(id = R.string.cancel),
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            habitViewModel.onHabitConfirmDeleteClick(habit)
-                            Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
-                            onDismiss()
-                        }, modifier = Modifier.padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = stringResource(id = R.string.confirm),
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                }
+    IconButton(
+        onClick = {
+            for (habit in deleteHabitList) {
+                habitViewModel.onHabitConfirmDeleteClick(habit)
             }
-        }
+            habitViewModel.deleteHabitList.clear()
+            Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
+            onDismiss()
+        },
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+        Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete", tint = Color.Red)
     }
 }
