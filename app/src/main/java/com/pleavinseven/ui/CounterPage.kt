@@ -80,18 +80,11 @@ fun CounterPage(
     val habit by habitViewModel.habitState.collectAsState()
     habitViewModel.setGoalCompletedColor(habit)
     val goalColor by habitViewModel.goalColorState.collectAsState()
-    var count by remember {
-        mutableIntStateOf(habit.count)
-    }
-    var showPopupWindow by remember {
-        mutableStateOf((false))
-    }
-    val showGoal by remember {
-        mutableStateOf(goal != null)
-    }
-
+    var count by remember { mutableIntStateOf(habit.count) }
+    var showPopupWindow by remember { mutableStateOf(false) }
+    val showGoal by remember { mutableStateOf(habit.goal != null) }
     val context = LocalContext.current
-    val fontSize = if (habitName.length < 10) 36.sp else 32.sp
+    val fontSize = if (habit.name.length < 10) 36.sp else 32.sp
 
     timeLogViewModel.getTimeLogs(habit.id)
     Scaffold(modifier = Modifier
@@ -128,7 +121,7 @@ fun CounterPage(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = habitName.uppercase(),
+                text = habit.name.uppercase(),
                 textAlign = TextAlign.Center,
                 style = TextStyle(fontSize = fontSize),
             )
@@ -214,7 +207,7 @@ fun CounterPage(
                 }
             }
             if (showGoal) {
-                GoalCard(goalColor, goal)
+                GoalCard(goalColor, habit.goal)
             }
         }
     }
@@ -225,7 +218,7 @@ fun GoalCard(goalColor: Int, goal: Int?) {
     Card(
         modifier = Modifier
             .height(48.dp)
-            .padding(horizontal = 28.dp),
+            .padding(start = 30.dp, end = 34.dp, bottom = 8.dp ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
