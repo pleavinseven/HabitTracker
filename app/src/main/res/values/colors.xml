@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="goal_reached_color">#34a27f</color>
+    <color name="delete_red">#B1291F</color>
 </resources>

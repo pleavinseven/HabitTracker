@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -110,7 +113,6 @@ fun HabitsPage(
         if (showPopupWindow) {
             AddHabitPopUp(habitViewModel, context) { showPopupWindow = false }
         }
-
         LazyVerticalGrid(
             modifier = Modifier.padding(innerPadding),
             columns = GridCells.Fixed(2),
@@ -119,6 +121,7 @@ fun HabitsPage(
                     val currentHabit = habitViewModel.habitList[item]
                     val topPadding = if (currentHabit.name.length < 10) 0.dp else 4.dp
                     val fontSize = if (currentHabit.name.length < 10) 36.sp else 32.sp
+                    val habitColor = remember { mutableIntStateOf(R.color.white) }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -132,9 +135,11 @@ fun HabitsPage(
                             },
                             onLongClick = {
                                 habitViewModel.setHabitDeleteList(currentHabit)
+                                habitColor.intValue = habitViewModel.setCardColor(currentHabit)
                                 Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
                             },
                             currentHabit = currentHabit,
+                            habitColor = colorResource(id = habitColor.intValue)
                         )
                         Text(
                             modifier = Modifier.padding(0.dp, topPadding, 0.dp, 4.dp),
@@ -156,6 +161,7 @@ fun HabitCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     currentHabit: Habit,
+    habitColor: Color
 ) {
     Card(
         modifier = Modifier
@@ -170,6 +176,9 @@ fun HabitCard(
                 }
             ),
         shape = CircleShape,
+        colors = CardDefaults.cardColors(
+            containerColor = habitColor
+        )
     ) {
         Column(
             Modifier.fillMaxSize(),

@@ -29,12 +29,8 @@ class HabitViewModel(
     private val _showDeleteIcon = MutableStateFlow(false)
     val showDeleteIcon: StateFlow<Boolean> get() = _showDeleteIcon
 
-    var deleteHabitList: MutableList<Habit> = mutableListOf()
     private val _deleteHabitList = mutableListOf<Habit>()
-
-    // show that items are in delete list
-    var _habitDeleteState by mutableStateOf(false)
-    private val habitDeleteState: Boolean = _habitDeleteState
+    var deleteHabitList: MutableList<Habit> = _deleteHabitList
 
     init {
         getHabits()
@@ -44,21 +40,29 @@ class HabitViewModel(
         _habitState.value = habit
     }
 
-    fun setHabitDeleteList(habit: Habit) {
+    fun setCardColor(habit: Habit): Int {
+        val habitColor = if (deleteHabitList.contains(habit)) {
+            R.color.delete_red
+        } else {
+            R.color.white
+        }
+        return habitColor
+    }
+
+    private fun isDeleteListEmpty(){
         if (deleteHabitList.isEmpty()) {
             setShowDelete()
         }
-        if (deleteHabitList.contains(habit)) {
-            deleteHabitList.remove(habit)
-            setHabitDeleteList(habit)
-        } else {
-            addHabitToDeleteList(habit)
-        }
     }
 
-    private fun addHabitToDeleteList(habit: Habit) {
-        deleteHabitList.add(habit)
-
+    fun setHabitDeleteList(habit: Habit) {
+        isDeleteListEmpty()
+        if (deleteHabitList.contains(habit)) {
+            _deleteHabitList.remove(habit)
+            isDeleteListEmpty()
+        } else {
+            _deleteHabitList.add(habit)
+        }
     }
 
     fun setShowDelete() {
