@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -25,15 +23,12 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,18 +50,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.pleavinseven.R
+import com.pleavinseven.composables.MyTheme
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.HabitViewModel
 import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsPage(
     habitViewModel: HabitViewModel,
@@ -77,27 +73,22 @@ fun HabitsPage(
     val showDelete by habitViewModel.showDeleteIcon.collectAsState()
     var showPopupWindow by remember { mutableStateOf(false) }
     val deleteHabitList = habitViewModel.deleteHabitList
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .navigationBarsPadding(),
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    if (showDelete) {
-                        DeleteIconDialog(habitViewModel, deleteHabitList, context) {
-                            habitViewModel.setShowDelete()
-                        }
-                    }
+    MyTheme(
+        navController = navController,
+        hasTopBar = true,
+        topBarActions = {
+            if (showDelete) {
+                DeleteIconDialog(habitViewModel, deleteHabitList, context) {
+                    habitViewModel.setShowDelete()
                 }
-            )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     showPopupWindow = !showPopupWindow
-                }, Modifier.clip(RoundedCornerShape(45.dp))
+                },
+                modifier = Modifier.clip(RoundedCornerShape(45.dp))
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
@@ -106,21 +97,15 @@ fun HabitsPage(
                 )
             }
         },
-        bottomBar = {
-            BottomNavBar(navController)
-        }
-    ) { innerPadding ->
+    ) {
         if (showPopupWindow) {
             AddHabitPopUp(habitViewModel, context) { showPopupWindow = false }
         }
         LazyVerticalGrid(
-            modifier = Modifier.padding(innerPadding),
             columns = GridCells.Fixed(2),
             content = {
                 items(habitViewModel.habitList.size) { item ->
                     val currentHabit = habitViewModel.habitList[item]
-                    val topPadding = if (currentHabit.name.length < 10) 0.dp else 4.dp
-                    val fontSize = if (currentHabit.name.length < 10) 36.sp else 32.sp
                     val habitColor = remember { mutableIntStateOf(R.color.white) }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -153,7 +138,6 @@ fun HabitsPage(
         )
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -298,6 +282,10 @@ fun DeleteIconDialog(
         modifier = Modifier
             .padding(8.dp)
     ) {
-        Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete", tint = Color.Red)
+        Icon(
+            imageVector = Icons.Outlined.Delete,
+            contentDescription = "Delete",
+            tint = Color.Red
+        )
     }
 }
