@@ -1,30 +1,28 @@
 package com.pleavinseven.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.pleavinseven.composables.MyTheme
+import com.pleavinseven.viewmodels.HabitViewModel
+import com.pleavinseven.viewmodels.LazyCalendarViewModel
+import com.pleavinseven.viewmodels.TimeLogViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogPage(
-    navController: NavController
+    navController: NavController,
+    timeLogViewModel: TimeLogViewModel,
+    lazyCalendarViewModel: LazyCalendarViewModel,
+    habitViewModel: HabitViewModel
 ) {
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .navigationBarsPadding(),
-        topBar = {
-            TopAppBar(title = {})
-        },
-        bottomBar = {
-            BottomNavBar(navController)
-        }) { innerPadding ->
-        innerPadding
+    val size = timeLogViewModel.timeLogList
+    MyTheme(navController = navController) {
+        LazyCalendar(lazyCalendarViewModel)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2)
+        ){
+            //graphs n shit
+        }
     }
 }
