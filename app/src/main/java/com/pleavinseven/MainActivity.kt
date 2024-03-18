@@ -10,10 +10,11 @@ import androidx.core.view.WindowCompat
 import com.pleavinseven.model.database.HabitDatabase
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.ui.HabitTrackerApp
+import com.pleavinseven.ui.LogPageViewModel
 import com.pleavinseven.ui.theme.HabitTrackerTheme
 import com.pleavinseven.viewmodels.HabitViewModel
 import com.pleavinseven.viewmodels.HabitViewModelFactory
-import com.pleavinseven.viewmodels.LazyCalendarViewModel
+import com.pleavinseven.viewmodels.LogPageViewModelFactory
 import com.pleavinseven.viewmodels.TimeLogViewModel
 import com.pleavinseven.viewmodels.TimeLogViewModelFactory
 import com.pleavinseven.workers.ResetWorkManagerScheduler
@@ -35,11 +36,17 @@ class MainActivity : ComponentActivity() {
         val timeLogViewModel: TimeLogViewModel by viewModels {
             TimeLogViewModelFactory(repository)
         }
-        val lazyCalendarViewModel = LazyCalendarViewModel()
+        val logPageViewModel: LogPageViewModel by viewModels {
+            LogPageViewModelFactory(repository)
+        }
         setContent {
             HabitTrackerTheme {
                 Surface {
-                    HabitTrackerApp(habitViewModel, timeLogViewModel, lazyCalendarViewModel)
+                    HabitTrackerApp(
+                        habitViewModel,
+                        timeLogViewModel,
+                        logPageViewModel
+                    )
                 }
             }
         }
