@@ -49,17 +49,15 @@ class HabitViewModel(
         return habitColor
     }
 
-    private fun isDeleteListEmpty(){
+    fun setHabitDeleteList(habit: Habit) {
         if (deleteHabitList.isEmpty()) {
             setShowDelete()
         }
-    }
-
-    fun setHabitDeleteList(habit: Habit) {
-        isDeleteListEmpty()
         if (deleteHabitList.contains(habit)) {
             _deleteHabitList.remove(habit)
-            isDeleteListEmpty()
+            if (deleteHabitList.isEmpty()) {
+                setShowDelete()
+            }
         } else {
             _deleteHabitList.add(habit)
         }
