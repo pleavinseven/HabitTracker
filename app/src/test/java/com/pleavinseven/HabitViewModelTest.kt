@@ -49,7 +49,6 @@ class HabitViewModelTest {
 
         coEvery { mockRepository.getHabits() } returns flowOf(testHabitList)
         coEvery { mockRepository.updateHabit(any()) } returns Unit
-        coEvery { mockRepository.getHabitWithTimeLogs(any()) } returns flowOf()
         coEvery { mockRepository.addHabit(any()) } returns Unit
         coEvery { mockRepository.deleteHabit(any()) } returns Unit
         every { mockResetWorkManagerScheduler.scheduleLogAndReset(any(), any()) } returns Unit
