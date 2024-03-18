@@ -10,7 +10,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -49,7 +48,7 @@ class TimeLogViewModelTest {
         mockRepository = mockk()
 
         coEvery { mockRepository.addTimeLog(any()) } returns Unit
-        coEvery { mockRepository.getHabitWithTimeLogs(any()) } returns flowOf()
+        coEvery { mockRepository.getMonthlyHabitDataList(any(), any()) } returns listOf()
         coEvery { mockRepository.removeLastTimeLog(any()) } returns Unit
         launch {
             viewModel = TimeLogViewModel(mockRepository)

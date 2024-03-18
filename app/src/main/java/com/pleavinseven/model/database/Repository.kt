@@ -16,8 +16,8 @@ class Repository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    fun getHabitWithTimeLogs(habitId: Int): Flow<List<HabitWithTimeLogs>> {
-        return timeLogDao.getHabitWithTimeLogs(habitId)
+    suspend fun getMonthlyHabitDataList(month: Int, year: Int): List<HabitWithTimeLogs> {
+        return timeLogDao.getMonthlyHabitDataList(month, year)
     }
 
     fun getHabits(): Flow<List<Habit>> {

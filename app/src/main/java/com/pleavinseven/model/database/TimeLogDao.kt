@@ -7,7 +7,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.pleavinseven.model.entities.TimeLogModel
 import com.pleavinseven.model.entities.relations.HabitWithTimeLogs
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TimeLogDao {
@@ -19,7 +18,10 @@ interface TimeLogDao {
     suspend fun deleteTimeLog(timeLogModel: TimeLogModel)
 
     @Transaction
-    @Query("SELECT * FROM habit where id = :habitId")
-    fun getHabitWithTimeLogs(habitId: Int): Flow<List<HabitWithTimeLogs>>
+    @Query("SELECT * FROM habit" +
+            " INNER JOIN daily_count ON habit.id = daily_count.habitId" +
+            " INNER JOIN time_log ON habit.id = time_log.habitId" +
+            " WHERE daily_count.year = :year AND daily_count.month = :month")
+    suspend fun getMonthlyHabitDataList( month: Int, year: Int): List<HabitWithTimeLogs>
 
 }
