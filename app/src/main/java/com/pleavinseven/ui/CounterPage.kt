@@ -86,7 +86,6 @@ fun CounterPage(
     val context = LocalContext.current
     val fontSize = if (habit.name.length < 10) 36.sp else 32.sp
 
-    timeLogViewModel.getTimeLogs(habit.id)
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()

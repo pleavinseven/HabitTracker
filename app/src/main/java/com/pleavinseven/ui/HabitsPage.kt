@@ -60,13 +60,11 @@ import com.pleavinseven.composables.MyTheme
 import com.pleavinseven.model.entities.Habit
 import com.pleavinseven.utils.Utils
 import com.pleavinseven.viewmodels.HabitViewModel
-import com.pleavinseven.viewmodels.TimeLogViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HabitsPage(
     habitViewModel: HabitViewModel,
-    timeLogViewModel: TimeLogViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -116,7 +114,6 @@ fun HabitsPage(
                                 navController.navigate(
                                     "CounterPage"
                                 )
-                                timeLogViewModel.getTimeLogs(currentHabit.id)
                             },
                             onLongClick = {
                                 habitViewModel.setHabitDeleteList(currentHabit)
