@@ -1,4 +1,4 @@
-package com.pleavinseven.ui
+package com.pleavinseven.viewmodels
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

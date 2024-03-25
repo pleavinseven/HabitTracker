@@ -3,7 +3,6 @@ package com.pleavinseven.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.pleavinseven.model.database.Repository
-import com.pleavinseven.ui.LogPageViewModel
 
 class LogPageViewModelFactory(
     private val repository: Repository,

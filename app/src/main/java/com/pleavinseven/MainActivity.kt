@@ -10,7 +10,7 @@ import androidx.core.view.WindowCompat
 import com.pleavinseven.model.database.HabitDatabase
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.ui.HabitTrackerApp
-import com.pleavinseven.ui.LogPageViewModel
+import com.pleavinseven.viewmodels.LogPageViewModel
 import com.pleavinseven.ui.theme.HabitTrackerTheme
 import com.pleavinseven.viewmodels.HabitViewModel
 import com.pleavinseven.viewmodels.HabitViewModelFactory

@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pleavinseven.composables.MyTheme
+import com.pleavinseven.viewmodels.LogPageViewModel
 
 @Composable
 fun LogPage(
@@ -44,7 +45,6 @@ fun LogPage(
         }
     }
 }
-
 
 @Composable
 fun LazyCalendar(viewModel: LogPageViewModel) {
