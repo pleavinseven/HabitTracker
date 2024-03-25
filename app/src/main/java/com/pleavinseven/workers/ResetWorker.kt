@@ -7,7 +7,10 @@ import com.pleavinseven.model.database.HabitDatabase
 import com.pleavinseven.model.database.Repository
 import com.pleavinseven.model.entities.DailyCount
 import com.pleavinseven.model.entities.Habit
+import java.io.IOException
 import java.time.LocalDateTime
+import java.util.concurrent.TimeoutException
+
 
 class ResetWorker(appContext: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(appContext, workerParameters) {
@@ -24,7 +27,9 @@ class ResetWorker(appContext: Context, workerParameters: WorkerParameters) :
             logDailyCount()
             resetHabits()
             Result.success()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            Result.retry()
+        } catch (e: TimeoutException) {
             Result.retry()
         }
     }
