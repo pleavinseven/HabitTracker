@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
             TimeLogViewModelFactory(repository)
         }
         val logPageViewModel: LogPageViewModel by viewModels {
-            LogPageViewModelFactory(repository)
+            LogPageViewModelFactory(repository, habitViewModel)
         }
         setContent {
             HabitTrackerTheme {
