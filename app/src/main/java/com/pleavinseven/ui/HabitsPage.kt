@@ -71,12 +71,21 @@ fun HabitsPage(
     val showDelete by habitViewModel.showDeleteIcon.collectAsState()
     var showPopupWindow by remember { mutableStateOf(false) }
     val deleteHabitList = habitViewModel.deleteHabitList
+
+    fun onDeleteIconClick() {
+        for (habit in deleteHabitList) {
+            habitViewModel.onHabitConfirmDeleteClick(habit)
+        }
+        habitViewModel.deleteHabitList.clear()
+        Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
+    }
+
     MyTheme(
         navController = navController,
         hasTopBar = true,
         topBarActions = {
             if (showDelete) {
-                DeleteIconDialog(habitViewModel, deleteHabitList, context) {
+                DeleteIconDialog({ onDeleteIconClick() }) {
                     habitViewModel.setShowDelete()
                 }
             }
@@ -124,10 +133,15 @@ fun HabitsPage(
                             habitColor = colorResource(id = habitColor.intValue)
                         )
                         Text(
-                            modifier = Modifier.padding(0.dp, topPadding, 0.dp, 4.dp),
+                            modifier = Modifier.padding(
+                                0.dp,
+                                top = if (currentHabit.name.length < 10) 0.dp else 4.dp,
+                                0.dp,
+                                4.dp
+                            ),
                             text = currentHabit.name,
                             textAlign = TextAlign.Center,
-                            style = TextStyle(fontSize = fontSize)
+                            style = TextStyle(fontSize = if (currentHabit.name.length < 10) 36.sp else 32.sp)
                         )
                     }
                 }
@@ -175,7 +189,6 @@ fun HabitCard(
     }
 }
 
-
 @Composable
 fun AddHabitPopUp(
     habitViewModel: HabitViewModel,
@@ -183,15 +196,9 @@ fun AddHabitPopUp(
     onDismiss: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var habitName by remember {
-        mutableStateOf("")
-    }
-    var habitGoal by remember {
-        mutableStateOf("")
-    }
-    val habitRepeat by remember {
-        mutableLongStateOf(1)
-    }
+    var habitName by remember { mutableStateOf("") }
+    var habitGoal by remember { mutableStateOf("") }
+    val habitRepeat by remember { mutableLongStateOf(1) }
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -262,18 +269,12 @@ fun AddHabitPopUp(
 
 @Composable
 fun DeleteIconDialog(
-    habitViewModel: HabitViewModel,
-    deleteHabitList: List<Habit>,
-    context: Context,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDeleteIconClick: () -> Unit
 ) {
     IconButton(
         onClick = {
-            for (habit in deleteHabitList) {
-                habitViewModel.onHabitConfirmDeleteClick(habit)
-            }
-            habitViewModel.deleteHabitList.clear()
-            Utils.vibrate(context, Utils.VIBE_EFFECT_DOUBLE_CLICK)
+            onDeleteIconClick()
             onDismiss()
         },
         modifier = Modifier
@@ -285,4 +286,15 @@ fun DeleteIconDialog(
             tint = Color.Red
         )
     }
+}
+
+@Preview
+@Composable
+private fun HabitCardPreview() {
+    HabitCard(
+        onClick = {},
+        onLongClick = { },
+        currentHabit = Habit(0, "name", 1, null, 0),
+        habitColor = Color.White
+    )
 }
