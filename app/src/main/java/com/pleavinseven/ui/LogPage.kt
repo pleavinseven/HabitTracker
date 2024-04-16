@@ -51,6 +51,12 @@ fun LazyCalendar(viewModel: LogPageViewModel) {
 
     var dateTitle by remember(viewModel) { mutableStateOf(viewModel.formattedDateString) }
     var monthLength by remember(viewModel) { mutableStateOf(viewModel.getMonthLength()) }
+    val lazyListState = rememberLazyListState()
+
+    // scroll to last index so calendar starts at most recent/ last day of month
+    LaunchedEffect(viewModel.scrollIndex) {
+        lazyListState.scrollToItem(index = viewModel.scrollIndex)
+    }
 
     Column {
         Row(
@@ -64,13 +70,15 @@ fun LazyCalendar(viewModel: LogPageViewModel) {
                         viewModel.monthClick()
                         monthLength = viewModel.getMonthLength()
                         dateTitle = viewModel.formattedDateString
+                        monthLength.lastIndex
                     }
                     .weight(1f),
                 text = dateTitle
             )
         }
         LazyRow(
-            Modifier.padding(
+            state = lazyListState,
+            modifier = Modifier.padding(
                 top = 10.dp,
             )
         ) {
@@ -78,7 +86,8 @@ fun LazyCalendar(viewModel: LogPageViewModel) {
                 CalendarCard(
                     day = item,
                     onClick = {
-
+                        viewModel.scrollIndex = monthLength.indexOf(item)
+                        viewModel.showDataForGraphsByDay(day = viewModel.scrollIndex + 1)
                     }
                 )
             }
