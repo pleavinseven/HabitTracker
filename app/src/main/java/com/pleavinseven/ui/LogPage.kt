@@ -55,7 +55,7 @@ fun LogPage(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2)
         ) {
-
+            // TODO add other graphs/ logs
         }
     }
 }
@@ -101,7 +101,6 @@ fun LazyCalendar(viewModel: LogPageViewModel) {
                     day = item,
                     onClick = {
                         viewModel.scrollIndex = monthLength.indexOf(item)
-                        viewModel.showDataForGraphsByDay(day = viewModel.scrollIndex + 1)
                     }
                 )
             }
