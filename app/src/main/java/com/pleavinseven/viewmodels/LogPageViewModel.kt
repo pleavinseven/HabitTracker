@@ -24,6 +24,7 @@ class LogPageViewModel(
     private val currentDate: LocalDate = LocalDate.now()
     private var date: LocalDate = LocalDate.now()
     var formattedDateString: String = date.format(DateTimeFormatter.ofPattern("LLL yyyy"))
+    var scrollIndex by mutableIntStateOf(getMonthLength().size)
 
     fun getDataForGraphs() {
         viewModelScope.launch {
