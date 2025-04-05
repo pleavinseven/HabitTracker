@@ -3,11 +3,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.pleavinseven"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pleavinseven"
@@ -41,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
     packaging {
         resources {
@@ -51,56 +52,44 @@ android {
 }
 
 dependencies {
+    implementation(libs.coreKtx)
+    implementation(libs.lifecycleRuntimeKtx)
+    implementation(libs.activityCompose)
+    implementation(platform(libs.composeBom))
+    implementation(libs.composeUi)
+    implementation(libs.composeUiGraphics)
+    implementation(libs.composeUiToolingPreview)
+    implementation(libs.material3)
+    implementation(libs.lifecycleViewModelCompose)
+    implementation(libs.activityKtx)
+    implementation(libs.navigationCompose)
+    implementation(libs.materialIconsExtended)
+    implementation(libs.workRuntimeKtx)
 
-    val composeVersion = "2.7.0"
-    val workVersion = "2.9.0"
+    // Vico dependencies
+    implementation(libs.vicoCompose)
+    implementation(libs.vicoComposeM2)
+    implementation(libs.vicoComposeM3)
+    implementation(libs.vicoCore)
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$composeVersion")
-    implementation("androidx.activity:activity-ktx:1.8.2")
-    implementation("androidx.test:monitor:1.6.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.material:material-icons-extended:1.6.5")
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
+    // Room dependencies
+    implementation(libs.roomRuntime)
+    implementation(libs.roomKtx)
+    testImplementation(libs.roomTesting)
+    implementation(libs.roomPaging)
+    ksp(libs.roomCompiler)
 
-    val vicoVersion = "2.0.0-alpha.13"
-
-    implementation("com.patrykandpatrick.vico:compose:$vicoVersion")
-    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
-    implementation("com.patrykandpatrick.vico:compose-m2:$vicoVersion")
-    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
-    implementation("com.patrykandpatrick.vico:compose-m3:$vicoVersion")
-    implementation("com.patrykandpatrick.vico:core:$vicoVersion")
-
-    val roomVersion = "2.6.1"
-
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    testImplementation("androidx.room:room-testing:$roomVersion")
-    implementation("androidx.room:room-paging:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
-
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.test:core-ktx:1.5.0")
-    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    testImplementation("io.mockk:mockk:1.13.5")
-    androidTestImplementation("io.mockk:mockk-android:1.12.5")
-    testImplementation("androidx.work:work-testing:$workVersion")
-    androidTestImplementation("androidx.work:work-testing:$workVersion")
+    // Test dependencies
+    testImplementation(libs.junit)
+    testImplementation(libs.coreKtxTest)
+    testImplementation(libs.extJunitKtx)
+    androidTestImplementation(libs.extJunitKtx)
+    androidTestImplementation(libs.espressoCore)
+    androidTestImplementation(platform(libs.composeBom))
+    androidTestImplementation(libs.composeUiTestJunit4)
+    testImplementation(libs.coroutinesTest)
+    testImplementation(libs.coroutinesCore)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockkAndroid)
+    testImplementation(libs.workTesting)
 }
